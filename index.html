@@ -1,0 +1,601 @@
+```html
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CONECT FONO — sua comunidade</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap"
+      rel="stylesheet"
+    />
+
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+
+  <body>
+    <header class="topbar">
+
+      <a
+        class="brand"
+        href="#inicio"
+        aria-label="CONECT FONO, início"
+      >
+        <img
+          class="brand-mark"
+          src="assets/logo-mark.png"
+          alt=""
+        />
+        <span>CONECT</span>
+        <i>F O N O</i>
+      </a>
+
+      <button
+        class="menu-toggle"
+        aria-label="Abrir menu"
+      >
+        ☰
+      </button>
+
+      <nav id="main-nav">
+        <a class="active" href="#inicio">Início</a>
+        <a href="portal.html?area=conteudos">Conteúdos</a>
+        <a href="portal.html?area=oportunidades">Oportunidades</a>
+        <a href="portal.html?area=pesquisa">Ciência &amp; Pesquisa</a>
+        <a href="portal.html?area=projetos">Projetos</a>
+        <a href="eventos.html">Eventos</a>
+        <a href="loja.html">Loja da CONECT</a>
+        <a href="#sobre">Sobre nós</a>
+      </nav>
+
+      <div class="header-actions">
+        <span class="bag">♧</span>
+
+        <button
+          class="profile"
+          id="auth-trigger"
+        >
+          Entrar / Cadastrar
+        </button>
+      </div>
+    </header>
+
+
+    <main id="inicio">
+
+      <section class="hero">
+
+        <div class="hero-copy">
+
+          <p class="eyebrow pill">
+            ♧ &nbsp; COMUNIDADE ACADÊMICA
+          </p>
+
+          <h1>
+            Conhecimento<br />
+            que <em>conecta.</em>
+          </h1>
+
+          <span class="accent-line"></span>
+
+          <p class="lead">
+            Uma comunidade que aproxima estudantes,
+            conhecimento, oportunidades e experiências
+            em Fonoaudiologia.
+          </p>
+
+          <div class="hero-buttons">
+
+            <a
+              class="button button-dark"
+              href="#conexoes"
+            >
+              Faça parte da CONECT
+              <span>→</span>
+            </a>
+
+            <a
+              class="button button-outline"
+              href="#sobre"
+            >
+              Conheça a comunidade
+              <span>→</span>
+            </a>
+
+          </div>
+
+          <div class="online">
+            <span
+              class="avatars"
+              id="member-avatars"
+            ></span>
+
+            <span>
+              <strong id="member-count">0</strong>
+              estudantes e professores conectados
+            </span>
+          </div>
+
+        </div>
+
+        <div
+          class="hero-art"
+          aria-label="Estudantes de fonoaudiologia em uma conversa descontraída"
+        ></div>
+
+      </section>
+
+
+      <section
+        class="categories"
+        id="conteudos"
+      >
+
+        <div class="category-grid">
+
+          <a
+            href="portal.html?area=conteudos"
+            class="category-card"
+          >
+            <span>♧</span>
+            <h3>Conteúdos</h3>
+            <p>
+              Resumos, materiais e<br />
+              dicas para sua jornada.
+            </p>
+          </a>
+
+          <a
+            href="portal.html?area=oportunidades"
+            class="category-card"
+          >
+            <span>▫</span>
+            <h3>Oportunidades</h3>
+            <p>
+              Possibilidades para<br />
+              sua trajetória.
+            </p>
+          </a>
+
+          <a
+            href="portal.html?area=pesquisa"
+            class="category-card"
+          >
+            <span>⚗</span>
+            <h3>Ciência &amp; Pesquisa</h3>
+            <p>
+              Projetos e iniciativas<br />
+              que transformam.
+            </p>
+          </a>
+
+          <a
+            href="portal.html?area=projetos"
+            class="category-card"
+          >
+            <span>♧</span>
+            <h3>Projetos</h3>
+            <p>
+              Iniciativas que geram<br />
+              impacto na comunidade.
+            </p>
+          </a>
+
+          <a
+            href="eventos.html"
+            class="category-card"
+          >
+            <span>▪</span>
+            <h3>Eventos</h3>
+            <p>
+              Acompanhe tudo<br />
+              que acontece por aqui.
+            </p>
+          </a>
+
+          <a
+            href="loja.html"
+            class="category-card"
+          >
+            <span>♧</span>
+            <h3>Loja da CONECT</h3>
+            <p>
+              Produtos exclusivos<br />
+              da nossa comunidade.
+            </p>
+          </a>
+
+        </div>
+
+      </section>
+
+
+      <section
+        class="event-section"
+        id="eventos"
+      >
+
+        <div class="event-head">
+
+          <div>
+            <p class="eyebrow">
+              NO CENTRO DOS HOLOFOTES
+            </p>
+
+            <h2>
+              Próxima<br />
+              <em>experiência.</em>
+            </h2>
+          </div>
+
+          <a
+            href="#admin"
+            class="text-link"
+          >
+            Ver todos os eventos
+            <span>→</span>
+          </a>
+
+        </div>
+
+        <article
+          class="featured-event"
+          id="featured-event"
+        ></article>
+
+      </section>
+
+
+      <section
+        id="conexoes"
+        class="community"
+      >
+
+        <p class="eyebrow">
+          FEITO POR E PARA FONOS
+        </p>
+
+        <h2>
+          A sua jornada não<br />
+          precisa ser <em>sozinha.</em>
+        </h2>
+
+        <a
+          href="#admin"
+          class="button button-light"
+        >
+          Fazer parte
+          <span>↗</span>
+        </a>
+
+      </section>
+
+
+      <section
+        class="admin-section"
+        id="admin"
+      >
+
+        <div>
+
+          <p class="eyebrow">
+            CONECT FONO
+          </p>
+
+          <h2>
+            Faça parte desta<br />
+            <em>comunidade.</em>
+          </h2>
+
+          <p class="admin-intro">
+            Crie seu perfil, acompanhe as experiências
+            e conecte-se a pessoas que vivem a Fonoaudiologia.
+          </p>
+
+        </div>
+
+        <div
+          class="admin-panel"
+          id="admin-panel"
+        ></div>
+
+      </section>
+
+    </main>
+
+
+    <button
+      class="chat-toggle"
+      id="chat-toggle"
+      aria-label="Abrir chat"
+    >
+      ✦
+      <span>Fale com a CONECT</span>
+    </button>
+
+
+    <aside
+      class="chat-box open"
+      id="chat-box"
+      aria-hidden="false"
+    >
+
+      <div class="chat-header">
+
+        <span>
+          <b>Olá! 👋</b>
+          <br />
+
+          <small>
+            Sou a CONECT IA &nbsp;
+            <i>BETA</i>
+            <br />
+            Como posso te ajudar hoje?
+          </small>
+        </span>
+
+        <button
+          id="close-chat"
+          aria-label="Fechar chat"
+        >
+          ×
+        </button>
+
+      </div>
+
+
+      <div class="quick-actions">
+
+        <button>
+          ♧
+          <span>
+            Quero conhecer a comunidade
+            <small>
+              Saiba mais sobre a CONECT
+            </small>
+          </span>
+        </button>
+
+        <button>
+          ▪
+          <span>
+            Tenho uma dúvida
+            <small>
+              Tire suas dúvidas com a IA
+            </small>
+          </span>
+        </button>
+
+        <button>
+          ♧
+          <span>
+            Quero saber sobre eventos
+            <small>
+              Veja os próximos eventos
+            </small>
+          </span>
+        </button>
+
+        <button>
+          ♧
+          <span>
+            Quero falar com a equipe
+            <small>
+              Atendimento humano
+            </small>
+          </span>
+        </button>
+
+      </div>
+
+
+      <div
+        class="messages"
+        id="messages"
+      ></div>
+
+
+      <form id="chat-form">
+
+        <input
+          id="chat-input"
+          placeholder="Digite sua mensagem..."
+        />
+
+        <button aria-label="Enviar">
+          ➜
+        </button>
+
+      </form>
+
+    </aside>
+
+
+    <footer id="sobre">
+
+      <a
+        class="brand"
+        href="#inicio"
+      >
+        <span>CONECT</span>
+        <i>FONO</i>
+      </a>
+
+      <p>
+        Uma comunidade para conectar quem transforma
+        vidas através da comunicação.
+      </p>
+
+      <small>
+        © 2026 CONECT FONO
+      </small>
+
+    </footer>
+
+
+    <div
+      class="modal"
+      id="auth-modal"
+      aria-hidden="true"
+    >
+
+      <div class="modal-card">
+
+        <button
+          class="modal-close"
+          data-close-modal
+        >
+          ×
+        </button>
+
+
+        <div class="auth-tabs">
+
+          <button
+            class="tab active"
+            data-tab="login"
+          >
+            Entrar
+          </button>
+
+          <button
+            class="tab"
+            data-tab="signup"
+          >
+            Criar conta
+          </button>
+
+        </div>
+
+
+        <form
+          id="login-form"
+          class="auth-form"
+        >
+
+          <h2>Boas-vindas!</h2>
+
+          <p>
+            Entre para acessar sua jornada CONECT.
+          </p>
+
+          <label>
+            E-mail
+            <input
+              id="login-email"
+              type="email"
+              required
+            />
+          </label>
+
+          <label>
+            Senha
+            <input
+              id="login-password"
+              type="password"
+              required
+            />
+          </label>
+
+          <button
+            class="button button-dark"
+            type="submit"
+          >
+            Entrar na CONECT →
+          </button>
+
+          <small
+            id="login-message"
+            class="form-message"
+          ></small>
+
+        </form>
+
+
+        <form
+          id="signup-form"
+          class="auth-form hidden"
+        >
+
+          <h2>Faça parte.</h2>
+
+          <p>
+            Crie seu perfil e conecte-se à comunidade.
+          </p>
+
+          <label>
+            Nome completo
+            <input
+              id="signup-name"
+              required
+            />
+          </label>
+
+          <label>
+            E-mail
+            <input
+              id="signup-email"
+              type="email"
+              required
+            />
+          </label>
+
+          <label>
+            Você é
+
+            <select id="signup-role">
+              <option value="student">
+                Estudante
+              </option>
+
+              <option value="teacher">
+                Professor(a)
+              </option>
+            </select>
+          </label>
+
+          <label>
+            Senha
+
+            <input
+              id="signup-password"
+              type="password"
+              minlength="6"
+              required
+            />
+          </label>
+
+          <button
+            class="button button-dark"
+            type="submit"
+          >
+            Criar minha conta →
+          </button>
+
+          <small
+            id="signup-message"
+            class="form-message"
+          ></small>
+
+        </form>
+
+      </div>
+
+    </div>
+
+
+    <div
+      class="toast"
+      id="toast"
+    ></div>
+
+
+    <script src="app.js"></script>
+
+  </body>
+</html>
+```
