@@ -1308,57 +1308,175 @@ if (featured) {
 
 
 /* =========================================================
-   CHAT
+   CHAT - CONECT IA
    ========================================================= */
 
-const chatToggle =
-  $('#chat-toggle');
+const chatToggle = $('#chat-toggle');
+const chatBox = $('#chat-box');
+const closeChat = $('#close-chat');
+const chatForm = $('#chat-form');
+
+
+/* =========================
+   ABRIR CHAT
+   ========================= */
+
+function openChat() {
+
+  if (!chatBox) return;
+
+  chatBox.classList.add('open');
+
+  chatBox.setAttribute(
+    'aria-hidden',
+    'false'
+  );
+
+}
+
+
+/* =========================
+   FECHAR CHAT
+   ========================= */
+
+function closeChatBox() {
+
+  if (!chatBox) return;
+
+  chatBox.classList.remove('open');
+
+  chatBox.setAttribute(
+    'aria-hidden',
+    'true'
+  );
+
+}
+
+
+/* =========================
+   BOTÃO DA IA
+   ========================= */
 
 if (chatToggle) {
 
-  chatToggle.onclick =
-    () => {
+  chatToggle.addEventListener(
+    'click',
+    function (event) {
 
-      const box =
-        $('#chat-box');
+      event.preventDefault();
+      event.stopPropagation();
 
-      if (box) {
-        box.classList.add(
-          'open'
-        );
+      if (
+        chatBox &&
+        chatBox.classList.contains('open')
+      ) {
+
+        closeChatBox();
+
+      } else {
+
+        openChat();
+
       }
 
-    };
+    }
+  );
+
 }
 
-const closeChat =
-  $('#close-chat');
+
+/* =========================
+   BOTÃO X
+   ========================= */
 
 if (closeChat) {
 
-  closeChat.onclick =
-    () => {
+  closeChat.addEventListener(
+    'click',
+    function (event) {
 
-      const box =
-        $('#chat-box');
+      event.preventDefault();
+      event.stopPropagation();
 
-      if (box) {
-        box.classList.remove(
-          'open'
-        );
-      }
+      closeChatBox();
 
-    };
+    }
+  );
+
+
+  /* Compatibilidade com celular */
+
+  closeChat.addEventListener(
+    'touchend',
+    function (event) {
+
+      event.preventDefault();
+      event.stopPropagation();
+
+      closeChatBox();
+
+    },
+    {
+      passive: false
+    }
+  );
+
 }
 
-const chatForm =
-  $('#chat-form');
+
+/* =========================
+   FECHAR CLICANDO FORA
+   ========================= */
+
+if (chatBox) {
+
+  chatBox.addEventListener(
+    'click',
+    function (event) {
+
+      if (
+        event.target === chatBox
+      ) {
+
+        closeChatBox();
+
+      }
+
+    }
+  );
+
+}
+
+
+/* =========================
+   ESC NO COMPUTADOR
+   ========================= */
+
+document.addEventListener(
+  'keydown',
+  function (event) {
+
+    if (
+      event.key === 'Escape'
+    ) {
+
+      closeChatBox();
+
+    }
+
+  }
+);
+
+
+/* =========================
+   FORMULÁRIO DA IA
+   ========================= */
 
 if (chatForm) {
 
-  chatForm.onsubmit = e => {
+  chatForm.onsubmit = function (event) {
 
-    e.preventDefault();
+    event.preventDefault();
 
     const input =
       $('#chat-input');
@@ -1377,6 +1495,7 @@ if (chatForm) {
     input.value = '';
 
   };
+
 }
 
 
