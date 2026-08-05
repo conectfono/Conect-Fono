@@ -25,6 +25,7 @@ const seedAdmin = {
 };
 
 const $ = s => document.querySelector(s);
+
 const uid = () => crypto.randomUUID();
 
 const get = (key, fallback = []) =>
@@ -73,11 +74,15 @@ const upcoming = () =>
     .sort((a, b) => a.date.localeCompare(b.date));
 
 const eventInFocus = () =>
-  events.find(e => e.featured && e.status === 'scheduled') ||
-  upcoming()[0];
+  events.find(
+    e => e.featured && e.status === 'scheduled'
+  ) || upcoming()[0];
 
 function toast(text) {
   const el = $('#toast');
+
+  if (!el) return;
+
   el.textContent = text;
   el.classList.add('show');
 
@@ -89,6 +94,8 @@ function toast(text) {
 function renderHeader() {
   const b = $('#auth-trigger');
 
+  if (!b) return;
+
   if (session) {
     b.textContent = `Olá, ${session.name.split(' ')[0]} ▾`;
 
@@ -98,39 +105,56 @@ function renderHeader() {
     };
   } else {
     b.textContent = 'Entrar / Cadastrar';
-    b.onclick = () => openModal('login');
+
+    b.onclick = () => {
+      openModal('login');
+    };
   }
 }
 
 function renderPopulation() {
   const members = users.filter(
-    u => u.role === 'student' || u.role === 'teacher'
+    u =>
+      u.role === 'student' ||
+      u.role === 'teacher'
   );
 
-  $('#member-count').textContent = members.length;
+  const count = $('#member-count');
+  const avatars = $('#member-avatars');
 
-  $('#member-avatars').innerHTML = members
-    .slice(0, 5)
-    .map(
-      u =>
-        `<b title="${escapeHTML(u.name)}">${escapeHTML(
-          u.name[0]
-        )}</b>`
-    )
-    .join('');
+  if (count) {
+    count.textContent = members.length;
+  }
+
+  if (avatars) {
+    avatars.innerHTML = members
+      .slice(0, 5)
+      .map(
+        u =>
+          `<b title="${escapeHTML(u.name)}">${escapeHTML(
+            u.name[0]
+          )}</b>`
+      )
+      .join('');
+  }
 }
 
 function renderFeatured() {
   const e = eventInFocus();
   const holder = $('#featured-event');
 
+  if (!holder) return;
+
   if (!e) {
     holder.innerHTML = `
       <div class="event-empty">
         <h3>Nenhum evento programado.</h3>
-        <p>Volte em breve para acompanhar as próximas experiências.</p>
+        <p>
+          Volte em breve para acompanhar as próximas experiências.
+        </p>
       </div>
     `;
+
     return;
   }
 
@@ -199,7 +223,10 @@ function eventForm() {
   return `
     <form id="event-form">
 
-      <input type="hidden" id="event-id" />
+      <input
+        type="hidden"
+        id="event-id"
+      />
 
       <label>
         Nome do evento
@@ -227,11 +254,20 @@ function eventForm() {
           Status
 
           <select id="status">
-            <option value="scheduled">Programado</option>
-            <option value="draft">Rascunho</option>
-            <option value="finished">Encerrado</option>
-          </select>
 
+            <option value="scheduled">
+              Programado
+            </option>
+
+            <option value="draft">
+              Rascunho
+            </option>
+
+            <option value="finished">
+              Encerrado
+            </option>
+
+          </select>
         </label>
 
       </div>
@@ -295,14 +331,17 @@ function eventList() {
   return `
     <div class="event-list">
 
-      <h3>Eventos cadastrados</h3>
+      <h3>
+        Eventos cadastrados
+      </h3>
 
       ${
         events.length
           ? events
               .slice()
-              .sort((a, b) =>
-                a.date.localeCompare(b.date)
+              .sort(
+                (a, b) =>
+                  a.date.localeCompare(b.date)
               )
               .map(
                 e => `
@@ -333,7 +372,9 @@ function eventList() {
 
                     <div>
 
-                      <button data-edit="${e.id}">
+                      <button
+                        data-edit="${e.id}"
+                      >
                         Editar
                       </button>
 
@@ -399,7 +440,7 @@ function manager() {
         class="manager-tab"
         data-manager="people"
       >
-        Pessoas (${users.length - 1})
+        Pessoas (${Math.max(users.length - 1, 0)})
       </button>
 
       <button
@@ -429,8 +470,15 @@ function manager() {
 
 function userDashboard() {
   const mine = enrollments
-    .filter(x => x.userId === session.id)
-    .map(x => events.find(e => e.id === x.eventId))
+    .filter(
+      x => x.userId === session.id
+    )
+    .map(
+      x =>
+        events.find(
+          e => e.id === x.eventId
+        )
+    )
     .filter(Boolean);
 
   return `
@@ -518,6 +566,8 @@ function userDashboard() {
 function renderAdmin() {
   const panel = $('#admin-panel');
 
+  if (!panel) return;
+
   if (!session) {
     panel.innerHTML = `
       <div class="locked">
@@ -541,15 +591,21 @@ function renderAdmin() {
       </div>
     `;
 
-    $('#locked-login').onclick = () =>
-      openModal('login');
+    const loginButton = $('#locked-login');
+
+    if (loginButton) {
+      loginButton.onclick = () => {
+        openModal('login');
+      };
+    }
 
     return;
   }
 
-  panel.innerHTML = adminGuard()
-    ? manager()
-    : userDashboard();
+  panel.innerHTML =
+    adminGuard()
+      ? manager()
+      : userDashboard();
 
   if (adminGuard()) {
     bindAdmin();
@@ -562,6 +618,7 @@ function signOut() {
   session = null;
 
   persist();
+
   renderHeader();
   renderFeatured();
   renderAdmin();
@@ -571,6 +628,8 @@ function signOut() {
 
 function bindAdmin() {
   const form = $('#event-form');
+
+  if (!form) return;
 
   form.onsubmit = ev => {
     ev.preventDefault();
@@ -588,33 +647,45 @@ function bindAdmin() {
     };
 
     if (item.featured) {
-      events.forEach(e => {
-        e.featured = false;
-      });
+      events.forEach(
+        e => (e.featured = false)
+      );
     }
 
     if (id) {
-      events = events.map(e =>
-        e.id === id ? item : e
+      events = events.map(
+        e =>
+          e.id === id
+            ? item
+            : e
       );
     } else {
       events.push(item);
     }
 
     persist();
+
     renderFeatured();
     renderAdmin();
 
     toast('Evento salvo com sucesso.');
   };
 
-  $('#logout').onclick = signOut;
+  const logout = $('#logout');
 
-  $('#admin-panel').addEventListener(
-    'click',
-    adminClick,
-    { once: true }
-  );
+  if (logout) {
+    logout.onclick = signOut;
+  }
+
+  const panel = $('#admin-panel');
+
+  if (panel) {
+    panel.addEventListener(
+      'click',
+      adminClick,
+      { once: true }
+    );
+  }
 }
 
 function adminClick(ev) {
@@ -626,24 +697,35 @@ function adminClick(ev) {
     renderManagerSection(
       ev.target.dataset.manager
     );
+
     return;
   }
 
   if (!id) return;
 
   if (ev.target.dataset.delete) {
-    if (confirm('Excluir este evento?')) {
+    if (
+      confirm(
+        'Excluir este evento?'
+      )
+    ) {
       events = events.filter(
         e => e.id !== id
       );
 
-      enrollments = enrollments.filter(
-        x => x.eventId !== id
-      );
+      enrollments =
+        enrollments.filter(
+          x => x.eventId !== id
+        );
 
       persist();
+
       renderFeatured();
       renderAdmin();
+
+      toast(
+        'Evento excluído.'
+      );
     }
 
     return;
@@ -659,21 +741,29 @@ function adminClick(ev) {
   $('#title').value = e.title;
   $('#date').value = e.date;
   $('#place').value = e.place;
-  $('#description').value = e.description;
+  $('#description').value =
+    e.description;
   $('#status').value = e.status;
-  $('#featured').checked = e.featured;
+  $('#featured').checked =
+    e.featured;
 
-  $('#cancel-edit').hidden = false;
+  $('#cancel-edit').hidden =
+    false;
 
-  $('#cancel-edit').onclick = () =>
-    renderAdmin();
+  $('#cancel-edit').onclick =
+    () => renderAdmin();
 }
 
 function renderManagerSection(tab) {
-  const content = $('#manager-content');
+  const content =
+    $('#manager-content');
+
+  if (!content) return;
 
   document
-    .querySelectorAll('.manager-tab')
+    .querySelectorAll(
+      '.manager-tab'
+    )
     .forEach(b =>
       b.classList.toggle(
         'active',
@@ -709,7 +799,9 @@ function renderManagerSection(tab) {
 
         ${
           users
-            .filter(u => u.role !== 'admin')
+            .filter(
+              u => u.role !== 'admin'
+            )
             .map(
               u => `
                 <div class="event-row">
@@ -730,7 +822,10 @@ function renderManagerSection(tab) {
                       }
                       · desde
                       ${dateFormat(
-                        u.createdAt.slice(0, 10)
+                        u.createdAt.slice(
+                          0,
+                          10
+                        )
                       )}
                     </small>
 
@@ -759,19 +854,30 @@ function renderManagerSection(tab) {
 
       if (
         id &&
-        confirm('Remover este cadastro?')
+        confirm(
+          'Remover este cadastro?'
+        )
       ) {
-        users = users.filter(
-          u => u.id !== id
-        );
+        users =
+          users.filter(
+            u => u.id !== id
+          );
 
-        enrollments = enrollments.filter(
-          x => x.userId !== id
-        );
+        enrollments =
+          enrollments.filter(
+            x => x.userId !== id
+          );
 
         persist();
+
         renderPopulation();
-        renderManagerSection('people');
+        renderManagerSection(
+          'people'
+        );
+
+        toast(
+          'Cadastro removido.'
+        );
       }
     };
 
@@ -788,7 +894,9 @@ function renderManagerSection(tab) {
         e => e.id === en.eventId
       )
     }))
-    .filter(x => x.u && x.e);
+    .filter(
+      x => x.u && x.e
+    );
 
   content.innerHTML = `
     <div class="manager-list">
@@ -838,51 +946,85 @@ function renderManagerSection(tab) {
 
   content.onclick = e => {
     const id =
-      e.target.dataset.removeEnrollment;
+      e.target.dataset
+        .removeEnrollment;
 
     if (
       id &&
-      confirm('Cancelar esta inscrição?')
+      confirm(
+        'Cancelar esta inscrição?'
+      )
     ) {
-      enrollments = enrollments.filter(
-        x => x.id !== id
-      );
+      enrollments =
+        enrollments.filter(
+          x => x.id !== id
+        );
 
       persist();
-      renderManagerSection('enrollments');
+
+      renderManagerSection(
+        'enrollments'
+      );
+
+      toast(
+        'Inscrição cancelada.'
+      );
     }
   };
 }
 
 function bindMember() {
-  $('#logout').onclick = signOut;
+  const logout =
+    $('#logout');
 
-  $('#admin-panel').onclick = e => {
+  if (logout) {
+    logout.onclick =
+      signOut;
+  }
+
+  const panel =
+    $('#admin-panel');
+
+  if (!panel) return;
+
+  panel.onclick = e => {
     const eventId =
-      e.target.dataset.cancelEnrollment;
+      e.target.dataset
+        .cancelEnrollment;
 
     if (eventId) {
-      enrollments = enrollments.filter(
-        x =>
-          !(
-            x.userId === session.id &&
-            x.eventId === eventId
-          )
-      );
+      enrollments =
+        enrollments.filter(
+          x =>
+            !(
+              x.userId ===
+                session.id &&
+              x.eventId ===
+                eventId
+            )
+        );
 
       persist();
+
       renderFeatured();
       renderAdmin();
 
-      toast('Inscrição cancelada.');
+      toast(
+        'Inscrição cancelada.'
+      );
     }
   };
 }
 
 function openModal(tab) {
-  $('#auth-modal').classList.add('open');
+  const modal =
+    $('#auth-modal');
 
-  $('#auth-modal').setAttribute(
+  if (!modal) return;
+
+  modal.classList.add('open');
+
+  modal.setAttribute(
     'aria-hidden',
     'false'
   );
@@ -891,9 +1033,16 @@ function openModal(tab) {
 }
 
 function closeModal() {
-  $('#auth-modal').classList.remove('open');
+  const modal =
+    $('#auth-modal');
 
-  $('#auth-modal').setAttribute(
+  if (!modal) return;
+
+  modal.classList.remove(
+    'open'
+  );
+
+  modal.setAttribute(
     'aria-hidden',
     'true'
   );
@@ -901,7 +1050,9 @@ function closeModal() {
 
 function switchTab(tab) {
   document
-    .querySelectorAll('.auth-tabs .tab')
+    .querySelectorAll(
+      '.auth-tabs .tab'
+    )
     .forEach(x =>
       x.classList.toggle(
         'active',
@@ -909,199 +1060,312 @@ function switchTab(tab) {
       )
     );
 
-  $('#login-form').classList.toggle(
-    'hidden',
-    tab !== 'login'
-  );
+  const login =
+    $('#login-form');
 
-  $('#signup-form').classList.toggle(
-    'hidden',
-    tab !== 'signup'
-  );
+  const signup =
+    $('#signup-form');
+
+  if (login) {
+    login.classList.toggle(
+      'hidden',
+      tab !== 'login'
+    );
+  }
+
+  if (signup) {
+    signup.classList.toggle(
+      'hidden',
+      tab !== 'signup'
+    );
+  }
 }
 
-$('#auth-modal').onclick = e => {
-  if (
-    e.target === e.currentTarget ||
-    e.target.dataset.closeModal !== undefined
-  ) {
+const authModal =
+  $('#auth-modal');
+
+if (authModal) {
+  authModal.onclick = e => {
+    if (
+      e.target ===
+        e.currentTarget ||
+      e.target.dataset
+        .closeModal !==
+        undefined
+    ) {
+      closeModal();
+    }
+
+    if (
+      e.target.dataset.tab
+    ) {
+      switchTab(
+        e.target.dataset.tab
+      );
+    }
+  };
+}
+
+const loginForm =
+  $('#login-form');
+
+if (loginForm) {
+  loginForm.onsubmit = e => {
+    e.preventDefault();
+
+    const email =
+      $('#login-email')
+        .value
+        .trim()
+        .toLowerCase();
+
+    const password =
+      $('#login-password')
+        .value;
+
+    const found =
+      users.find(
+        u =>
+          u.email
+            .toLowerCase() ===
+            email &&
+          u.password ===
+            password
+      );
+
+    if (!found) {
+      $('#login-message')
+        .textContent =
+        'E-mail ou senha incorretos.';
+
+      return;
+    }
+
+    session = {
+      id: found.id,
+      name: found.name,
+      role: found.role,
+      email: found.email
+    };
+
+    persist();
+
     closeModal();
-  }
 
-  if (e.target.dataset.tab) {
-    switchTab(e.target.dataset.tab);
-  }
-};
-
-$('#login-form').onsubmit = e => {
-  e.preventDefault();
-
-  const found = users.find(
-    u =>
-      u.email.toLowerCase() ===
-        $('#login-email')
-          .value
-          .trim()
-          .toLowerCase() &&
-      u.password ===
-        $('#login-password').value
-  );
-
-  if (!found) {
-    $('#login-message').textContent =
-      'E-mail ou senha incorretos.';
-
-    return;
-  }
-
-  session = {
-    id: found.id,
-    name: found.name,
-    role: found.role,
-    email: found.email
-  };
-
-  persist();
-  closeModal();
-  renderHeader();
-  renderFeatured();
-  renderAdmin();
-
-  toast(
-    `Bem-vindo(a), ${session.name.split(' ')[0]}!`
-  );
-};
-
-$('#signup-form').onsubmit = e => {
-  e.preventDefault();
-
-  const email = $('#signup-email')
-    .value
-    .trim()
-    .toLowerCase();
-
-  if (
-    users.some(
-      u => u.email.toLowerCase() === email
-    )
-  ) {
-    $('#signup-message').textContent =
-      'Este e-mail já possui uma conta.';
-
-    return;
-  }
-
-  const u = {
-    id: uid(),
-    name: $('#signup-name').value.trim(),
-    email,
-    password: $('#signup-password').value,
-    role: $('#signup-role').value,
-    createdAt: new Date().toISOString()
-  };
-
-  users.push(u);
-
-  session = {
-    id: u.id,
-    name: u.name,
-    role: u.role,
-    email: u.email
-  };
-
-  persist();
-  closeModal();
-  renderHeader();
-  renderPopulation();
-  renderAdmin();
-
-  toast(
-    'Sua conta foi criada. Bem-vindo(a)!'
-  );
-};
-
-$('#featured-event').onclick = e => {
-  const eventId =
-    e.target.dataset.enroll;
-
-  if (!eventId) return;
-
-  if (!session) {
-    openModal('login');
+    renderHeader();
+    renderFeatured();
+    renderAdmin();
 
     toast(
-      'Entre ou crie uma conta para participar.'
+      `Bem-vindo(a), ${session.name.split(' ')[0]}!`
+    );
+  };
+}
+
+const signupForm =
+  $('#signup-form');
+
+if (signupForm) {
+  signupForm.onsubmit = e => {
+    e.preventDefault();
+
+    const email =
+      $('#signup-email')
+        .value
+        .trim()
+        .toLowerCase();
+
+    if (
+      users.some(
+        u =>
+          u.email
+            .toLowerCase() ===
+          email
+      )
+    ) {
+      $('#signup-message')
+        .textContent =
+        'Este e-mail já possui uma conta.';
+
+      return;
+    }
+
+    const u = {
+      id: uid(),
+      name:
+        $('#signup-name')
+          .value
+          .trim(),
+      email,
+      password:
+        $('#signup-password')
+          .value,
+      role:
+        $('#signup-role')
+          .value,
+      createdAt:
+        new Date().toISOString()
+    };
+
+    users.push(u);
+
+    session = {
+      id: u.id,
+      name: u.name,
+      role: u.role,
+      email: u.email
+    };
+
+    persist();
+
+    closeModal();
+
+    renderHeader();
+    renderPopulation();
+    renderAdmin();
+
+    toast(
+      'Sua conta foi criada. Bem-vindo(a)!'
+    );
+  };
+}
+
+const featured =
+  $('#featured-event');
+
+if (featured) {
+  featured.onclick = e => {
+    const eventId =
+      e.target.dataset.enroll;
+
+    if (!eventId) return;
+
+    if (!session) {
+      openModal('login');
+
+      toast(
+        'Entre ou crie uma conta para participar.'
+      );
+
+      return;
+    }
+
+    if (
+      enrollments.some(
+        x =>
+          x.eventId ===
+            eventId &&
+          x.userId ===
+            session.id
+      )
+    ) {
+      return;
+    }
+
+    enrollments.push({
+      id: uid(),
+      eventId,
+      userId: session.id,
+      createdAt:
+        new Date().toISOString()
+    });
+
+    persist();
+
+    renderFeatured();
+    renderAdmin();
+
+    toast(
+      'Inscrição confirmada! Nos vemos no evento.'
+    );
+  };
+}
+
+const chatToggle =
+  $('#chat-toggle');
+
+if (chatToggle) {
+  chatToggle.onclick =
+    () =>
+      $('#chat-box')
+        .classList.add(
+          'open'
+        );
+}
+
+const closeChat =
+  $('#close-chat');
+
+if (closeChat) {
+  closeChat.onclick =
+    () =>
+      $('#chat-box')
+        .classList.remove(
+          'open'
+        );
+}
+
+const chatForm =
+  $('#chat-form');
+
+if (chatForm) {
+  chatForm.onsubmit = e => {
+    e.preventDefault();
+
+    const text =
+      $('#chat-input')
+        .value
+        .trim();
+
+    if (!text) return;
+
+    toast(
+      'Recebemos sua mensagem! A CONECT IA responderá em breve.'
     );
 
-    return;
-  }
-
-  if (
-    enrollments.some(
-      x =>
-        x.eventId === eventId &&
-        x.userId === session.id
-    )
-  ) {
-    return;
-  }
-
-  enrollments.push({
-    id: uid(),
-    eventId,
-    userId: session.id,
-    createdAt: new Date().toISOString()
-  });
-
-  persist();
-  renderFeatured();
-  renderAdmin();
-
-  toast(
-    'Inscrição confirmada! Nos vemos no evento.'
-  );
-};
-
-$('#chat-toggle').onclick = () =>
-  $('#chat-box').classList.add('open');
-
-$('#close-chat').onclick = () =>
-  $('#chat-box').classList.remove('open');
-
-$('#chat-form').onsubmit = e => {
-  e.preventDefault();
-
-  const text =
-    $('#chat-input').value.trim();
-
-  if (!text) return;
-
-  toast('Recebemos sua mensagem! A CONECT IA responderá em breve.');
-
-  $('#chat-input').value = '';
-};
+    $('#chat-input')
+      .value = '';
+  };
+}
 
 document
-  .querySelectorAll('.quick-actions button')
+  .querySelectorAll(
+    '.quick-actions button'
+  )
   .forEach(
     b =>
       (b.onclick = () => {
         if (
-          b.textContent.includes('eventos')
+          b.textContent
+            .toLowerCase()
+            .includes('eventos')
         ) {
-          location.hash = 'eventos';
+          location.hash =
+            'eventos';
         } else if (
-          b.textContent.includes('comunidade')
+          b.textContent
+            .toLowerCase()
+            .includes('comunidade')
         ) {
           openModal('signup');
         }
       })
   );
 
-$('.menu-toggle').onclick = () =>
-  $('#main-nav').classList.toggle('open');
+const menuToggle =
+  $('.menu-toggle');
+
+if (menuToggle) {
+  menuToggle.onclick =
+    () =>
+      $('#main-nav')
+        .classList.toggle(
+          'open'
+        );
+}
 
 persist();
+
 renderHeader();
 renderPopulation();
 renderFeatured();
