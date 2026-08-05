@@ -1076,9 +1076,7 @@ $('#chat-form').onsubmit = e => {
 
   if (!text) return;
 
-  toast(
-    'Recebemos sua mensagem! A CONECT IA responderá em breve.'
-  );
+  toast('Recebemos sua mensagem! A CONECT IA responderá em breve.');
 
   $('#chat-input').value = '';
 };
