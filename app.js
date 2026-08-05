@@ -626,50 +626,55 @@ function signOut() {
   toast('Você saiu da sua conta.');
 }
 
+
+/* =========================================================
+   ADMIN
+   ========================================================= */
+
 function bindAdmin() {
   const form = $('#event-form');
 
-  if (!form) return;
+  if (form) {
+    form.onsubmit = ev => {
+      ev.preventDefault();
 
-  form.onsubmit = ev => {
-    ev.preventDefault();
+      const id = $('#event-id').value;
 
-    const id = $('#event-id').value;
+      const item = {
+        id: id || uid(),
+        title: $('#title').value.trim(),
+        date: $('#date').value,
+        place: $('#place').value.trim(),
+        description: $('#description').value.trim(),
+        status: $('#status').value,
+        featured: $('#featured').checked
+      };
 
-    const item = {
-      id: id || uid(),
-      title: $('#title').value.trim(),
-      date: $('#date').value,
-      place: $('#place').value.trim(),
-      description: $('#description').value.trim(),
-      status: $('#status').value,
-      featured: $('#featured').checked
+      if (item.featured) {
+        events.forEach(
+          e => (e.featured = false)
+        );
+      }
+
+      if (id) {
+        events = events.map(
+          e =>
+            e.id === id
+              ? item
+              : e
+        );
+      } else {
+        events.push(item);
+      }
+
+      persist();
+
+      renderFeatured();
+      renderAdmin();
+
+      toast('Evento salvo com sucesso.');
     };
-
-    if (item.featured) {
-      events.forEach(
-        e => (e.featured = false)
-      );
-    }
-
-    if (id) {
-      events = events.map(
-        e =>
-          e.id === id
-            ? item
-            : e
-      );
-    } else {
-      events.push(item);
-    }
-
-    persist();
-
-    renderFeatured();
-    renderAdmin();
-
-    toast('Evento salvo com sucesso.');
-  };
+  }
 
   const logout = $('#logout');
 
@@ -680,38 +685,64 @@ function bindAdmin() {
   const panel = $('#admin-panel');
 
   if (panel) {
-    panel.addEventListener(
-      'click',
-      adminClick,
-      { once: true }
-    );
+    /*
+      CORREÇÃO:
+      Antes havia addEventListener com { once: true }.
+      Agora o painel continua recebendo cliques
+      normalmente.
+    */
+    panel.onclick = adminClick;
+  }
+
+  const cancelEdit = $('#cancel-edit');
+
+  if (cancelEdit) {
+    cancelEdit.onclick = () => {
+      renderAdmin();
+    };
   }
 }
 
-function adminClick(ev) {
-  const id =
-    ev.target.dataset.edit ||
-    ev.target.dataset.delete;
 
-  if (ev.target.dataset.manager) {
-    renderManagerSection(
-      ev.target.dataset.manager
-    );
+/* =========================================================
+   CLIQUES DO ADMIN
+   ========================================================= */
+
+function adminClick(ev) {
+
+  const managerButton =
+    ev.target.closest('[data-manager]');
+
+  if (managerButton) {
+    const tab =
+      managerButton.dataset.manager;
+
+    renderManagerSection(tab);
 
     return;
   }
 
-  if (!id) return;
+  const editButton =
+    ev.target.closest('[data-edit]');
 
-  if (ev.target.dataset.delete) {
+  const deleteButton =
+    ev.target.closest('[data-delete]');
+
+  if (deleteButton) {
+
+    const id =
+      deleteButton.dataset.delete;
+
     if (
       confirm(
         'Excluir este evento?'
       )
     ) {
-      events = events.filter(
-        e => e.id !== id
-      );
+
+      events =
+        events.filter(
+          e => e.id !== id
+        );
 
       enrollments =
         enrollments.filter(
@@ -731,47 +762,116 @@ function adminClick(ev) {
     return;
   }
 
-  const e = events.find(
-    x => x.id === id
-  );
+  if (editButton) {
 
-  if (!e) return;
+    const id =
+      editButton.dataset.edit;
 
-  $('#event-id').value = e.id;
-  $('#title').value = e.title;
-  $('#date').value = e.date;
-  $('#place').value = e.place;
-  $('#description').value =
-    e.description;
-  $('#status').value = e.status;
-  $('#featured').checked =
-    e.featured;
+    const e =
+      events.find(
+        x => x.id === id
+      );
 
-  $('#cancel-edit').hidden =
-    false;
+    if (!e) return;
 
-  $('#cancel-edit').onclick =
-    () => renderAdmin();
+    const eventId =
+      $('#event-id');
+
+    const title =
+      $('#title');
+
+    const date =
+      $('#date');
+
+    const place =
+      $('#place');
+
+    const description =
+      $('#description');
+
+    const status =
+      $('#status');
+
+    const featured =
+      $('#featured');
+
+    const cancel =
+      $('#cancel-edit');
+
+    if (eventId) {
+      eventId.value = e.id;
+    }
+
+    if (title) {
+      title.value = e.title;
+    }
+
+    if (date) {
+      date.value = e.date;
+    }
+
+    if (place) {
+      place.value = e.place;
+    }
+
+    if (description) {
+      description.value =
+        e.description;
+    }
+
+    if (status) {
+      status.value =
+        e.status;
+    }
+
+    if (featured) {
+      featured.checked =
+        e.featured;
+    }
+
+    if (cancel) {
+      cancel.hidden = false;
+    }
+
+    return;
+  }
 }
 
+
+/* =========================================================
+   ABAS DO ADMIN
+   ========================================================= */
+
 function renderManagerSection(tab) {
+
   const content =
     $('#manager-content');
 
   if (!content) return;
 
+
+  /* Atualiza a aba ativa */
+
   document
     .querySelectorAll(
       '.manager-tab'
     )
-    .forEach(b =>
-      b.classList.toggle(
+    .forEach(button => {
+
+      button.classList.toggle(
         'active',
-        b.dataset.manager === tab
-      )
-    );
+        button.dataset.manager === tab
+      );
+
+    });
+
+
+  /* =========================
+     EVENTOS
+     ========================= */
 
   if (tab === 'events') {
+
     content.innerHTML = `
       <div class="event-manager">
 
@@ -789,7 +889,13 @@ function renderManagerSection(tab) {
     return;
   }
 
+
+  /* =========================
+     PESSOAS
+     ========================= */
+
   if (tab === 'people') {
+
     content.innerHTML = `
       <div class="manager-list">
 
@@ -800,7 +906,8 @@ function renderManagerSection(tab) {
         ${
           users
             .filter(
-              u => u.role !== 'admin'
+              u =>
+                u.role !== 'admin'
             )
             .map(
               u => `
@@ -848,9 +955,22 @@ function renderManagerSection(tab) {
       </div>
     `;
 
+
+    /*
+      Eventos da lista de pessoas
+    */
+
     content.onclick = e => {
+
+      const removeButton =
+        e.target.closest(
+          '[data-remove-user]'
+        );
+
+      if (!removeButton) return;
+
       const id =
-        e.target.dataset.removeUser;
+        removeButton.dataset.removeUser;
 
       if (
         id &&
@@ -858,6 +978,7 @@ function renderManagerSection(tab) {
           'Remover este cadastro?'
         )
       ) {
+
         users =
           users.filter(
             u => u.id !== id
@@ -871,6 +992,7 @@ function renderManagerSection(tab) {
         persist();
 
         renderPopulation();
+
         renderManagerSection(
           'people'
         );
@@ -879,101 +1001,147 @@ function renderManagerSection(tab) {
           'Cadastro removido.'
         );
       }
+
     };
 
     return;
   }
 
-  const rows = enrollments
-    .map(en => ({
-      en,
-      u: users.find(
-        u => u.id === en.userId
-      ),
-      e: events.find(
-        e => e.id === en.eventId
-      )
-    }))
-    .filter(
-      x => x.u && x.e
-    );
 
-  content.innerHTML = `
-    <div class="manager-list">
+  /* =========================
+     INSCRIÇÕES
+     ========================= */
 
-      <h3>
-        Inscrições
-      </h3>
+  if (tab === 'enrollments') {
 
-      ${
-        rows
-          .map(
-            x => `
-              <div class="event-row">
+    const rows =
+      enrollments
+        .map(en => ({
+          en,
 
-                <div>
+          u:
+            users.find(
+              u =>
+                u.id === en.userId
+            ),
 
-                  <strong>
-                    ${escapeHTML(x.u.name)}
-                  </strong>
-
-                  <small>
-                    ${escapeHTML(x.e.title)}
-                    ·
-                    ${dateFormat(x.e.date)}
-                    ·
-                    ${escapeHTML(x.u.email)}
-                  </small>
-
-                </div>
-
-                <button
-                  class="delete"
-                  data-remove-enrollment="${x.en.id}"
-                >
-                  Cancelar
-                </button>
-
-              </div>
-            `
-          )
-          .join('') ||
-        '<p>Nenhuma inscrição ainda.</p>'
-      }
-
-    </div>
-  `;
-
-  content.onclick = e => {
-    const id =
-      e.target.dataset
-        .removeEnrollment;
-
-    if (
-      id &&
-      confirm(
-        'Cancelar esta inscrição?'
-      )
-    ) {
-      enrollments =
-        enrollments.filter(
-          x => x.id !== id
+          e:
+            events.find(
+              e =>
+                e.id === en.eventId
+            )
+        }))
+        .filter(
+          x =>
+            x.u &&
+            x.e
         );
 
-      persist();
 
-      renderManagerSection(
-        'enrollments'
-      );
+    content.innerHTML = `
+      <div class="manager-list">
 
-      toast(
-        'Inscrição cancelada.'
-      );
-    }
-  };
+        <h3>
+          Inscrições
+        </h3>
+
+        ${
+          rows
+            .map(
+              x => `
+                <div class="event-row">
+
+                  <div>
+
+                    <strong>
+                      ${escapeHTML(
+                        x.u.name
+                      )}
+                    </strong>
+
+                    <small>
+                      ${escapeHTML(
+                        x.e.title
+                      )}
+                      ·
+                      ${dateFormat(
+                        x.e.date
+                      )}
+                      ·
+                      ${escapeHTML(
+                        x.u.email
+                      )}
+                    </small>
+
+                  </div>
+
+                  <button
+                    class="delete"
+                    data-remove-enrollment="${x.en.id}"
+                  >
+                    Cancelar
+                  </button>
+
+                </div>
+              `
+            )
+            .join('') ||
+          '<p>Nenhuma inscrição ainda.</p>'
+        }
+
+      </div>
+    `;
+
+
+    content.onclick = e => {
+
+      const cancelButton =
+        e.target.closest(
+          '[data-remove-enrollment]'
+        );
+
+      if (!cancelButton) return;
+
+      const id =
+        cancelButton.dataset
+          .removeEnrollment;
+
+      if (
+        id &&
+        confirm(
+          'Cancelar esta inscrição?'
+        )
+      ) {
+
+        enrollments =
+          enrollments.filter(
+            x => x.id !== id
+          );
+
+        persist();
+
+        renderManagerSection(
+          'enrollments'
+        );
+
+        toast(
+          'Inscrição cancelada.'
+        );
+      }
+
+    };
+
+    return;
+  }
 }
 
+
+/* =========================================================
+   ÁREA DO MEMBRO
+   ========================================================= */
+
 function bindMember() {
+
   const logout =
     $('#logout');
 
@@ -988,11 +1156,20 @@ function bindMember() {
   if (!panel) return;
 
   panel.onclick = e => {
+
+    const button =
+      e.target.closest(
+        '[data-cancel-enrollment]'
+      );
+
+    if (!button) return;
+
     const eventId =
-      e.target.dataset
+      button.dataset
         .cancelEnrollment;
 
     if (eventId) {
+
       enrollments =
         enrollments.filter(
           x =>
@@ -1013,16 +1190,25 @@ function bindMember() {
         'Inscrição cancelada.'
       );
     }
+
   };
 }
 
+
+/* =========================================================
+   LOGIN / CADASTRO
+   ========================================================= */
+
 function openModal(tab) {
+
   const modal =
     $('#auth-modal');
 
   if (!modal) return;
 
-  modal.classList.add('open');
+  modal.classList.add(
+    'open'
+  );
 
   modal.setAttribute(
     'aria-hidden',
@@ -1033,6 +1219,7 @@ function openModal(tab) {
 }
 
 function closeModal() {
+
   const modal =
     $('#auth-modal');
 
@@ -1049,6 +1236,7 @@ function closeModal() {
 }
 
 function switchTab(tab) {
+
   document
     .querySelectorAll(
       '.auth-tabs .tab'
@@ -1067,6 +1255,7 @@ function switchTab(tab) {
     $('#signup-form');
 
   if (login) {
+
     login.classList.toggle(
       'hidden',
       tab !== 'login'
@@ -1074,6 +1263,7 @@ function switchTab(tab) {
   }
 
   if (signup) {
+
     signup.classList.toggle(
       'hidden',
       tab !== 'signup'
@@ -1081,11 +1271,14 @@ function switchTab(tab) {
   }
 }
 
+
 const authModal =
   $('#auth-modal');
 
 if (authModal) {
+
   authModal.onclick = e => {
+
     if (
       e.target ===
         e.currentTarget ||
@@ -1093,24 +1286,34 @@ if (authModal) {
         .closeModal !==
         undefined
     ) {
+
       closeModal();
     }
 
     if (
       e.target.dataset.tab
     ) {
+
       switchTab(
         e.target.dataset.tab
       );
     }
+
   };
 }
+
+
+/* =========================================================
+   LOGIN
+   ========================================================= */
 
 const loginForm =
   $('#login-form');
 
 if (loginForm) {
+
   loginForm.onsubmit = e => {
+
     e.preventDefault();
 
     const email =
@@ -1134,6 +1337,7 @@ if (loginForm) {
       );
 
     if (!found) {
+
       $('#login-message')
         .textContent =
         'E-mail ou senha incorretos.';
@@ -1142,10 +1346,15 @@ if (loginForm) {
     }
 
     session = {
+
       id: found.id,
+
       name: found.name,
+
       role: found.role,
+
       email: found.email
+
     };
 
     persist();
@@ -1157,16 +1366,26 @@ if (loginForm) {
     renderAdmin();
 
     toast(
-      `Bem-vindo(a), ${session.name.split(' ')[0]}!`
+      `Bem-vindo(a), ${
+        session.name.split(' ')[0]
+      }!`
     );
+
   };
 }
+
+
+/* =========================================================
+   CADASTRO
+   ========================================================= */
 
 const signupForm =
   $('#signup-form');
 
 if (signupForm) {
+
   signupForm.onsubmit = e => {
+
     e.preventDefault();
 
     const email =
@@ -1183,6 +1402,7 @@ if (signupForm) {
           email
       )
     ) {
+
       $('#signup-message')
         .textContent =
         'Este e-mail já possui uma conta.';
@@ -1191,29 +1411,41 @@ if (signupForm) {
     }
 
     const u = {
+
       id: uid(),
+
       name:
         $('#signup-name')
           .value
           .trim(),
+
       email,
+
       password:
         $('#signup-password')
           .value,
+
       role:
         $('#signup-role')
           .value,
+
       createdAt:
         new Date().toISOString()
+
     };
 
     users.push(u);
 
     session = {
+
       id: u.id,
+
       name: u.name,
+
       role: u.role,
+
       email: u.email
+
     };
 
     persist();
@@ -1227,20 +1459,36 @@ if (signupForm) {
     toast(
       'Sua conta foi criada. Bem-vindo(a)!'
     );
+
   };
 }
+
+
+/* =========================================================
+   EVENTO EM DESTAQUE
+   ========================================================= */
 
 const featured =
   $('#featured-event');
 
 if (featured) {
+
   featured.onclick = e => {
+
+    const button =
+      e.target.closest(
+        '[data-enroll]'
+      );
+
+    if (!button) return;
+
     const eventId =
-      e.target.dataset.enroll;
+      button.dataset.enroll;
 
     if (!eventId) return;
 
     if (!session) {
+
       openModal('login');
 
       toast(
@@ -1259,15 +1507,22 @@ if (featured) {
             session.id
       )
     ) {
+
       return;
     }
 
     enrollments.push({
+
       id: uid(),
+
       eventId,
-      userId: session.id,
+
+      userId:
+        session.id,
+
       createdAt:
         new Date().toISOString()
+
     });
 
     persist();
@@ -1278,44 +1533,71 @@ if (featured) {
     toast(
       'Inscrição confirmada! Nos vemos no evento.'
     );
+
   };
 }
+
+
+/* =========================================================
+   CHAT
+   ========================================================= */
 
 const chatToggle =
   $('#chat-toggle');
 
 if (chatToggle) {
+
   chatToggle.onclick =
-    () =>
-      $('#chat-box')
-        .classList.add(
+    () => {
+
+      const box =
+        $('#chat-box');
+
+      if (box) {
+        box.classList.add(
           'open'
         );
+      }
+
+    };
 }
 
 const closeChat =
   $('#close-chat');
 
 if (closeChat) {
+
   closeChat.onclick =
-    () =>
-      $('#chat-box')
-        .classList.remove(
+    () => {
+
+      const box =
+        $('#chat-box');
+
+      if (box) {
+        box.classList.remove(
           'open'
         );
+      }
+
+    };
 }
 
 const chatForm =
   $('#chat-form');
 
 if (chatForm) {
+
   chatForm.onsubmit = e => {
+
     e.preventDefault();
 
+    const input =
+      $('#chat-input');
+
+    if (!input) return;
+
     const text =
-      $('#chat-input')
-        .value
-        .trim();
+      input.value.trim();
 
     if (!text) return;
 
@@ -1323,10 +1605,15 @@ if (chatForm) {
       'Recebemos sua mensagem! A CONECT IA responderá em breve.'
     );
 
-    $('#chat-input')
-      .value = '';
+    input.value = '';
+
   };
 }
+
+
+/* =========================================================
+   AÇÕES RÁPIDAS
+   ========================================================= */
 
 document
   .querySelectorAll(
@@ -1335,34 +1622,66 @@ document
   .forEach(
     b =>
       (b.onclick = () => {
-        if (
+
+        const text =
           b.textContent
-            .toLowerCase()
-            .includes('eventos')
+            .toLowerCase();
+
+        if (
+          text.includes(
+            'eventos'
+          )
         ) {
+
           location.hash =
             'eventos';
+
         } else if (
-          b.textContent
-            .toLowerCase()
-            .includes('comunidade')
+          text.includes(
+            'comunidade'
+          )
         ) {
-          openModal('signup');
+
+          openModal(
+            'signup'
+          );
+
         }
+
       })
   );
+
+
+/* =========================================================
+   MENU MOBILE
+   ========================================================= */
 
 const menuToggle =
   $('.menu-toggle');
 
 if (menuToggle) {
+
   menuToggle.onclick =
-    () =>
-      $('#main-nav')
-        .classList.toggle(
+    () => {
+
+      const nav =
+        $('#main-nav');
+
+      if (nav) {
+
+        nav.classList.toggle(
           'open'
         );
+
+      }
+
+    };
 }
+
+
+/* =========================================================
+   INICIALIZAÇÃO
+   ========================================================= */
 
 persist();
 
