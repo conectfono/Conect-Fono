@@ -23,9 +23,9 @@ let products = get(PRODUCTS, []);
 const session = get(SESSION, null);
 
 
-/* ================================
-   RENDER DA LOJA
-================================ */
+/* ==========================================
+   RENDERIZAÇÃO DA LOJA
+========================================== */
 
 function render() {
 
@@ -34,9 +34,9 @@ function render() {
   if (!productArea) return;
 
 
-  /* ================================
-     PRODUTOS
-  ================================= */
+  /* ==========================================
+     LISTA DE PRODUTOS
+  ========================================== */
 
   if (!products.length) {
 
@@ -61,9 +61,17 @@ function render() {
 
     productArea.innerHTML = products.map(product => {
 
+      /*
+       * Se o produto tiver uma foto salva,
+       * usamos a foto.
+       *
+       * Se não tiver, mostramos um espaço
+       * neutro para não quebrar o card.
+       */
+
       const image = product.image
         ? safe(product.image)
-        : 'assets/produto-placeholder.png';
+        : '';
 
       const price = product.price
         ? safe(product.price)
@@ -78,19 +86,34 @@ function render() {
         product.name
       );
 
+
       return `
 
         <article class="card">
 
-          <div class="product-image">
+          ${
+            image
+              ? `
+                <div class="product-image">
 
-            <img
-              src="${image}"
-              alt="${safe(product.name)}"
-              onerror="this.src='assets/produto-placeholder.png'"
-            >
+                  <img
+                    src="${image}"
+                    alt="${safe(product.name)}"
+                  >
 
-          </div>
+                </div>
+              `
+              : `
+                <div class="product-image no-image">
+
+                  <span>
+                    🛍️
+                  </span>
+
+                </div>
+              `
+          }
+
 
           <div class="product-content">
 
@@ -102,11 +125,13 @@ function render() {
               ${safe(product.description)}
             </p>
 
+
             <div class="product-bottom">
 
               <strong class="product-price">
                 ${price}
               </strong>
+
 
               <a
                 class="button buy"
@@ -118,6 +143,7 @@ function render() {
               </a>
 
             </div>
+
 
             ${
               session?.role === 'admin'
@@ -143,9 +169,9 @@ function render() {
   }
 
 
-  /* ================================
+  /* ==========================================
      ÁREA ADMINISTRATIVA
-  ================================= */
+  ========================================== */
 
   const adminArea = $('#store-admin');
 
@@ -185,6 +211,55 @@ function render() {
       <form id="product-form">
 
 
+        <!-- ==========================
+             FOTO
+        =========================== -->
+
+        <label>
+
+          Foto do produto
+
+          <div
+            class="photo-upload"
+            id="photo-upload"
+          >
+
+            <input
+              id="product-image"
+              type="file"
+              accept="image/*"
+              hidden
+            >
+
+            <div
+              class="photo-upload-content"
+              id="photo-upload-content"
+            >
+
+              <div class="photo-icon">
+                📷
+              </div>
+
+              <strong>
+                Escolher foto
+              </strong>
+
+              <span>
+                Clique aqui para selecionar
+                uma imagem do computador
+              </span>
+
+            </div>
+
+          </div>
+
+        </label>
+
+
+        <!-- ==========================
+             NOME
+        =========================== -->
+
         <label>
 
           Nome do produto
@@ -198,6 +273,10 @@ function render() {
 
         </label>
 
+
+        <!-- ==========================
+             PREÇO + WHATSAPP
+        =========================== -->
 
         <div class="row">
 
@@ -232,30 +311,9 @@ function render() {
         </div>
 
 
-        <label>
-
-          Link da foto do produto
-
-          <input
-            id="product-image"
-            type="url"
-            placeholder="https://..."
-          >
-
-        </label>
-
-
-        <div
-          id="image-preview"
-          class="image-preview"
-        >
-
-          <span>
-            A prévia da imagem aparecerá aqui
-          </span>
-
-        </div>
-
+        <!-- ==========================
+             DESCRIÇÃO
+        =========================== -->
 
         <label>
 
@@ -269,6 +327,10 @@ function render() {
 
         </label>
 
+
+        <!-- ==========================
+             BOTÃO
+        =========================== -->
 
         <button
           class="button"
@@ -285,75 +347,164 @@ function render() {
   `;
 
 
-  /* ================================
-     PRÉVIA DA IMAGEM
-  ================================= */
+  /* ==========================================
+     SELEÇÃO DA FOTO
+  ========================================== */
 
-  const imageInput = $('#product-image');
-  const imagePreview = $('#image-preview');
+  const imageInput =
+    $('#product-image');
 
+  const photoUpload =
+    $('#photo-upload');
 
-  imageInput.addEventListener(
-    'input',
-    () => {
-
-      const url =
-        imageInput.value.trim();
+  const photoContent =
+    $('#photo-upload-content');
 
 
-      if (!url) {
+  if (photoUpload && imageInput) {
 
-        imagePreview.innerHTML = `
-          <span>
-            A prévia da imagem aparecerá aqui
-          </span>
-        `;
+    photoUpload.onclick = () => {
+      imageInput.click();
+    };
+
+
+    imageInput.onchange = event => {
+
+      const file =
+        event.target.files[0];
+
+      if (!file) return;
+
+
+      /*
+       * Verifica se realmente é uma imagem
+       */
+
+      if (!file.type.startsWith('image/')) {
+
+        alert(
+          'Por favor, escolha uma imagem.'
+        );
+
+        imageInput.value = '';
 
         return;
       }
 
 
-      imagePreview.innerHTML = `
+      /*
+       * Limite de tamanho:
+       * 5 MB
+       */
 
-        <img
-          src="${safe(url)}"
-          alt="Prévia do produto"
-          onerror="
-            this.style.display='none';
-            this.parentElement.innerHTML='<span>Não foi possível carregar esta imagem.</span>';
-          "
-        >
+      if (file.size > 5 * 1024 * 1024) {
 
-      `;
+        alert(
+          'A imagem deve ter no máximo 5 MB.'
+        );
 
-    }
-  );
+        imageInput.value = '';
+
+        return;
+      }
 
 
-  /* ================================
-     CADASTRO DO PRODUTO
-  ================================= */
+      /*
+       * FileReader transforma a imagem
+       * em Base64 para podermos salvar
+       * no localStorage.
+       */
 
-  $('#product-form').onsubmit = event => {
+      const reader =
+        new FileReader();
+
+
+      reader.onload = e => {
+
+        const imageData =
+          e.target.result;
+
+
+        photoContent.innerHTML = `
+
+          <img
+            src="${imageData}"
+            alt="Prévia do produto"
+            class="photo-preview"
+          >
+
+          <div class="photo-change">
+            Clique para trocar a foto
+          </div>
+
+        `;
+
+
+        /*
+         * Guardamos temporariamente
+         * a imagem no formulário.
+         */
+
+        photoUpload.dataset.image =
+          imageData;
+
+      };
+
+
+      reader.readAsDataURL(file);
+
+    };
+
+  }
+
+
+  /* ==========================================
+     FORMULÁRIO
+  ========================================== */
+
+  const form =
+    $('#product-form');
+
+
+  if (!form) return;
+
+
+  form.onsubmit = event => {
 
     event.preventDefault();
 
 
     const name =
-      $('#product-name').value.trim();
+      $('#product-name')
+        .value
+        .trim();
+
 
     const price =
-      $('#product-price').value.trim();
+      $('#product-price')
+        .value
+        .trim();
+
 
     const whatsapp =
-      $('#product-whatsapp').value.trim();
+      $('#product-whatsapp')
+        .value
+        .trim();
 
-    const image =
-      $('#product-image').value.trim();
 
     const description =
-      $('#product-description').value.trim();
+      $('#product-description')
+        .value
+        .trim();
 
+
+    const image =
+      photoUpload?.dataset.image || '';
+
+
+    /*
+     * Cria o produto
+     */
 
     const product = {
 
@@ -365,17 +516,33 @@ function render() {
 
       whatsapp,
 
-      image,
+      description,
 
-      description
+      image
 
     };
 
 
+    /*
+     * Adiciona à lista
+     */
+
     products.push(product);
 
-    put(PRODUCTS, products);
 
+    /*
+     * Salva no navegador
+     */
+
+    put(
+      PRODUCTS,
+      products
+    );
+
+
+    /*
+     * Atualiza a loja
+     */
 
     render();
 
@@ -389,11 +556,13 @@ function render() {
 }
 
 
-/* ================================
-   REMOVER PRODUTOS
-================================ */
+/* ==========================================
+   REMOVER PRODUTO
+========================================== */
 
-const productArea = $('#products');
+const productArea =
+  $('#products');
+
 
 if (productArea) {
 
@@ -435,8 +604,8 @@ if (productArea) {
 }
 
 
-/* ================================
-   INICIALIZAÇÃO
-================================ */
+/* ==========================================
+   INICIAR
+========================================== */
 
 render();
