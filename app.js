@@ -609,7 +609,12 @@ function renderAdmin() {
 
   if (adminGuard()) {
     bindAdmin();
+
+    // Um único listener para todas as abas do administrador.
+    // Não é substituído quando o conteúdo de Pessoas/Inscrições é renderizado.
+    panel.onclick = adminClick;
   } else {
+    panel.onclick = null;
     bindMember();
   }
 }
@@ -651,27 +656,18 @@ function bindAdmin() {
       };
 
       if (item.featured) {
-        events.forEach(
-          e => (e.featured = false)
-        );
+        events.forEach(e => (e.featured = false));
       }
 
       if (id) {
-        events = events.map(
-          e =>
-            e.id === id
-              ? item
-              : e
-        );
+        events = events.map(e => e.id === id ? item : e);
       } else {
         events.push(item);
       }
 
       persist();
-
       renderFeatured();
       renderAdmin();
-
       toast('Evento salvo com sucesso.');
     };
   }
@@ -682,24 +678,10 @@ function bindAdmin() {
     logout.onclick = signOut;
   }
 
-  const panel = $('#admin-panel');
-
-  if (panel) {
-    /*
-      CORREÇÃO:
-      Antes havia addEventListener com { once: true }.
-      Agora o painel continua recebendo cliques
-      normalmente.
-    */
-    panel.onclick = adminClick;
-  }
-
   const cancelEdit = $('#cancel-edit');
 
   if (cancelEdit) {
-    cancelEdit.onclick = () => {
-      renderAdmin();
-    };
+    cancelEdit.onclick = () => renderAdmin();
   }
 }
 
@@ -709,129 +691,92 @@ function bindAdmin() {
    ========================================================= */
 
 function adminClick(ev) {
-
-  const managerButton =
-    ev.target.closest('[data-manager]');
+  const managerButton = ev.target.closest('[data-manager]');
 
   if (managerButton) {
-    const tab =
-      managerButton.dataset.manager;
-
-    renderManagerSection(tab);
-
+    ev.preventDefault();
+    renderManagerSection(managerButton.dataset.manager);
     return;
   }
 
-  const editButton =
-    ev.target.closest('[data-edit]');
+  const removeUserButton = ev.target.closest('[data-remove-user]');
 
-  const deleteButton =
-    ev.target.closest('[data-delete]');
+  if (removeUserButton) {
+    const id = removeUserButton.dataset.removeUser;
 
-  if (deleteButton) {
-
-    const id =
-      deleteButton.dataset.delete;
-
-    if (
-      confirm(
-        'Excluir este evento?'
-      )
-    ) {
-
-      events =
-        events.filter(
-          e => e.id !== id
-        );
-
-      enrollments =
-        enrollments.filter(
-          x => x.eventId !== id
-        );
+    if (id && confirm('Remover este cadastro?')) {
+      users = users.filter(u => u.id !== id);
+      enrollments = enrollments.filter(x => x.userId !== id);
 
       persist();
-
-      renderFeatured();
-      renderAdmin();
-
-      toast(
-        'Evento excluído.'
-      );
+      renderPopulation();
+      renderManagerSection('people');
+      toast('Cadastro removido.');
     }
 
     return;
   }
 
+  const removeEnrollmentButton =
+    ev.target.closest('[data-remove-enrollment]');
+
+  if (removeEnrollmentButton) {
+    const id = removeEnrollmentButton.dataset.removeEnrollment;
+
+    if (id && confirm('Cancelar esta inscrição?')) {
+      enrollments = enrollments.filter(x => x.id !== id);
+
+      persist();
+      renderManagerSection('enrollments');
+      toast('Inscrição cancelada.');
+    }
+
+    return;
+  }
+
+  const deleteButton = ev.target.closest('[data-delete]');
+
+  if (deleteButton) {
+    const id = deleteButton.dataset.delete;
+
+    if (id && confirm('Excluir este evento?')) {
+      events = events.filter(e => e.id !== id);
+      enrollments = enrollments.filter(x => x.eventId !== id);
+
+      persist();
+      renderFeatured();
+      renderAdmin();
+      toast('Evento excluído.');
+    }
+
+    return;
+  }
+
+  const editButton = ev.target.closest('[data-edit]');
+
   if (editButton) {
-
-    const id =
-      editButton.dataset.edit;
-
-    const e =
-      events.find(
-        x => x.id === id
-      );
+    const id = editButton.dataset.edit;
+    const e = events.find(x => x.id === id);
 
     if (!e) return;
 
-    const eventId =
-      $('#event-id');
+    const eventId = $('#event-id');
+    const title = $('#title');
+    const date = $('#date');
+    const place = $('#place');
+    const description = $('#description');
+    const status = $('#status');
+    const featured = $('#featured');
+    const cancel = $('#cancel-edit');
 
-    const title =
-      $('#title');
-
-    const date =
-      $('#date');
-
-    const place =
-      $('#place');
-
-    const description =
-      $('#description');
-
-    const status =
-      $('#status');
-
-    const featured =
-      $('#featured');
-
-    const cancel =
-      $('#cancel-edit');
-
-    if (eventId) {
-      eventId.value = e.id;
-    }
-
-    if (title) {
-      title.value = e.title;
-    }
-
-    if (date) {
-      date.value = e.date;
-    }
-
-    if (place) {
-      place.value = e.place;
-    }
-
-    if (description) {
-      description.value =
-        e.description;
-    }
-
-    if (status) {
-      status.value =
-        e.status;
-    }
-
-    if (featured) {
-      featured.checked =
-        e.featured;
-    }
-
-    if (cancel) {
-      cancel.hidden = false;
-    }
+    if (eventId) eventId.value = e.id;
+    if (title) title.value = e.title;
+    if (date) date.value = e.date;
+    if (place) place.value = e.place;
+    if (description) description.value = e.description;
+    if (status) status.value = e.status;
+    if (featured) featured.checked = e.featured;
+    if (cancel) cancel.hidden = false;
 
     return;
   }
@@ -843,99 +788,52 @@ function adminClick(ev) {
    ========================================================= */
 
 function renderManagerSection(tab) {
-
-  const content =
-    $('#manager-content');
+  const content = $('#manager-content');
 
   if (!content) return;
 
-
-  /* Atualiza a aba ativa */
-
-  document
-    .querySelectorAll(
-      '.manager-tab'
-    )
-    .forEach(button => {
-
-      button.classList.toggle(
-        'active',
-        button.dataset.manager === tab
-      );
-
-    });
-
-
-  /* =========================
-     EVENTOS
-     ========================= */
+  document.querySelectorAll('.manager-tab').forEach(button => {
+    button.classList.toggle(
+      'active',
+      button.dataset.manager === tab
+    );
+  });
 
   if (tab === 'events') {
-
     content.innerHTML = `
       <div class="event-manager">
-
         <div>
           ${eventForm()}
         </div>
-
         ${eventList()}
-
       </div>
     `;
 
     bindAdmin();
-
     return;
   }
 
-
-  /* =========================
-     PESSOAS
-     ========================= */
-
   if (tab === 'people') {
-
     content.innerHTML = `
       <div class="manager-list">
-
-        <h3>
-          Cadastros
-        </h3>
+        <h3>Cadastros</h3>
 
         ${
           users
-            .filter(
-              u =>
-                u.role !== 'admin'
-            )
+            .filter(u => u.role !== 'admin')
             .map(
               u => `
                 <div class="event-row">
-
                   <div>
-
-                    <strong>
-                      ${escapeHTML(u.name)}
-                    </strong>
+                    <strong>${escapeHTML(u.name)}</strong>
 
                     <small>
                       ${escapeHTML(u.email)}
                       ·
-                      ${
-                        u.role === 'teacher'
-                          ? 'Professor(a)'
-                          : 'Estudante'
-                      }
+                      ${u.role === 'teacher' ? 'Professor(a)' : 'Estudante'}
                       · desde
-                      ${dateFormat(
-                        u.createdAt.slice(
-                          0,
-                          10
-                        )
-                      )}
+                      ${dateFormat(u.createdAt.slice(0, 10))}
                     </small>
-
                   </div>
 
                   <button
@@ -944,135 +842,46 @@ function renderManagerSection(tab) {
                   >
                     Remover
                   </button>
-
                 </div>
               `
             )
             .join('') ||
           '<p>Nenhum cadastro ainda.</p>'
         }
-
       </div>
     `;
-
-
-    /*
-      Eventos da lista de pessoas
-    */
-
-    content.onclick = e => {
-
-      const removeButton =
-        e.target.closest(
-          '[data-remove-user]'
-        );
-
-      if (!removeButton) return;
-
-      const id =
-        removeButton.dataset.removeUser;
-
-      if (
-        id &&
-        confirm(
-          'Remover este cadastro?'
-        )
-      ) {
-
-        users =
-          users.filter(
-            u => u.id !== id
-          );
-
-        enrollments =
-          enrollments.filter(
-            x => x.userId !== id
-          );
-
-        persist();
-
-        renderPopulation();
-
-        renderManagerSection(
-          'people'
-        );
-
-        toast(
-          'Cadastro removido.'
-        );
-      }
-
-    };
 
     return;
   }
 
-
-  /* =========================
-     INSCRIÇÕES
-     ========================= */
-
   if (tab === 'enrollments') {
-
-    const rows =
-      enrollments
-        .map(en => ({
-          en,
-
-          u:
-            users.find(
-              u =>
-                u.id === en.userId
-            ),
-
-          e:
-            events.find(
-              e =>
-                e.id === en.eventId
-            )
-        }))
-        .filter(
-          x =>
-            x.u &&
-            x.e
-        );
-
+    const rows = enrollments
+      .map(en => ({
+        en,
+        u: users.find(u => u.id === en.userId),
+        e: events.find(e => e.id === en.eventId)
+      }))
+      .filter(x => x.u && x.e);
 
     content.innerHTML = `
       <div class="manager-list">
-
-        <h3>
-          Inscrições
-        </h3>
+        <h3>Inscrições</h3>
 
         ${
           rows
             .map(
               x => `
                 <div class="event-row">
-
                   <div>
-
-                    <strong>
-                      ${escapeHTML(
-                        x.u.name
-                      )}
-                    </strong>
+                    <strong>${escapeHTML(x.u.name)}</strong>
 
                     <small>
-                      ${escapeHTML(
-                        x.e.title
-                      )}
+                      ${escapeHTML(x.e.title)}
                       ·
-                      ${dateFormat(
-                        x.e.date
-                      )}
+                      ${dateFormat(x.e.date)}
                       ·
-                      ${escapeHTML(
-                        x.u.email
-                      )}
+                      ${escapeHTML(x.u.email)}
                     </small>
-
                   </div>
 
                   <button
@@ -1081,55 +890,14 @@ function renderManagerSection(tab) {
                   >
                     Cancelar
                   </button>
-
                 </div>
               `
             )
             .join('') ||
           '<p>Nenhuma inscrição ainda.</p>'
         }
-
       </div>
     `;
-
-
-    content.onclick = e => {
-
-      const cancelButton =
-        e.target.closest(
-          '[data-remove-enrollment]'
-        );
-
-      if (!cancelButton) return;
-
-      const id =
-        cancelButton.dataset
-          .removeEnrollment;
-
-      if (
-        id &&
-        confirm(
-          'Cancelar esta inscrição?'
-        )
-      ) {
-
-        enrollments =
-          enrollments.filter(
-            x => x.id !== id
-          );
-
-        persist();
-
-        renderManagerSection(
-          'enrollments'
-        );
-
-        toast(
-          'Inscrição cancelada.'
-        );
-      }
-
-    };
 
     return;
   }
@@ -1139,6 +907,7 @@ function renderManagerSection(tab) {
 /* =========================================================
    ÁREA DO MEMBRO
    ========================================================= */
+
 
 function bindMember() {
 
