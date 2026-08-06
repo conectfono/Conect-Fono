@@ -26,18 +26,37 @@ const seedAdmin = {
 
 const $ = s => document.querySelector(s);
 
-const uid = () => crypto.randomUUID();
+const uid = () => {
+  if (window.crypto && crypto.randomUUID) {
+    return crypto.randomUUID();
+  }
 
-const get = (key, fallback = []) =>
-  JSON.parse(localStorage.getItem(key) || 'null') || fallback;
+  return 'id-' + Date.now() + '-' + Math.random().toString(16).slice(2);
+};
 
-const put = (key, value) =>
+const get = (key, fallback = []) => {
+  try {
+    const value = JSON.parse(localStorage.getItem(key));
+
+    return value !== null ? value : fallback;
+  } catch {
+    return fallback;
+  }
+};
+
+const put = (key, value) => {
   localStorage.setItem(key, JSON.stringify(value));
+};
 
 let events = get(DB.events, defaults);
 let users = get(DB.users, [seedAdmin]);
 let enrollments = get(DB.enrollments, []);
 let session = get(DB.session, null);
+
+
+/* =========================================================
+   FUNÇÕES GERAIS
+   ========================================================= */
 
 function persist() {
   put(DB.events, events);
@@ -46,8 +65,8 @@ function persist() {
   put(DB.session, session);
 }
 
-const escapeHTML = t =>
-  String(t).replace(/[&<>'"]/g, c => ({
+const escapeHTML = value =>
+  String(value ?? '').replace(/[&<>'"]/g, c => ({
     '&': '&amp;',
     '<': '&lt;',
     '>': '&gt;',
@@ -91,28 +110,298 @@ function toast(text) {
   }, 3300);
 }
 
+
+/* =========================================================
+   MENU MOBILE
+   ========================================================= */
+
+function initMobileMenu() {
+
+  const menuToggle = $('.menu-toggle');
+  const nav = $('#main-nav');
+
+  if (!menuToggle || !nav) return;
+
+  menuToggle.addEventListener('click', event => {
+
+    event.preventDefault();
+    event.stopPropagation();
+
+    nav.classList.toggle('open');
+
+    menuToggle.setAttribute(
+      'aria-expanded',
+      nav.classList.contains('open') ? 'true' : 'false'
+    );
+
+  });
+
+  nav.querySelectorAll('a').forEach(link => {
+
+    link.addEventListener('click', () => {
+      nav.classList.remove('open');
+
+      menuToggle.setAttribute(
+        'aria-expanded',
+        'false'
+      );
+    });
+
+  });
+
+}
+
+
+/* =========================================================
+   CONECT IA
+   ========================================================= */
+
+function openChat() {
+
+  const box = $('#chat-box');
+
+  if (!box) return;
+
+  box.classList.add('open');
+
+  box.setAttribute(
+    'aria-hidden',
+    'false'
+  );
+
+}
+
+
+function closeChat() {
+
+  const box = $('#chat-box');
+
+  if (!box) return;
+
+  box.classList.remove('open');
+
+  box.setAttribute(
+    'aria-hidden',
+    'true'
+  );
+
+}
+
+
+function initChat() {
+
+  const chatToggle = $('#chat-toggle');
+  const closeButton = $('#close-chat');
+  const chatBox = $('#chat-box');
+  const chatForm = $('#chat-form');
+
+  /*
+   * ABRIR
+   */
+
+  if (chatToggle) {
+
+    chatToggle.addEventListener('click', event => {
+
+      event.preventDefault();
+      event.stopPropagation();
+
+      if (
+        chatBox &&
+        chatBox.classList.contains('open')
+      ) {
+
+        closeChat();
+
+      } else {
+
+        openChat();
+
+      }
+
+    });
+
+  }
+
+
+  /*
+   * FECHAR PELO X
+   */
+
+  if (closeButton) {
+
+    closeButton.addEventListener('click', event => {
+
+      event.preventDefault();
+      event.stopPropagation();
+
+      closeChat();
+
+    });
+
+  }
+
+
+  /*
+   * NÃO FECHAR AO CLICAR DENTRO DA JANELA
+   */
+
+  if (chatBox) {
+
+    chatBox.addEventListener('click', event => {
+
+      event.stopPropagation();
+
+    });
+
+  }
+
+
+  /*
+   * FORMULÁRIO DO CHAT
+   */
+
+  if (chatForm) {
+
+    chatForm.addEventListener('submit', event => {
+
+      event.preventDefault();
+
+      const input = $('#chat-input');
+
+      if (!input) return;
+
+      const text = input.value.trim();
+
+      if (!text) return;
+
+      toast(
+        'Recebemos sua mensagem! A CONECT IA responderá em breve.'
+      );
+
+      input.value = '';
+
+    });
+
+  }
+
+
+  /*
+   * BOTÕES DE AÇÃO RÁPIDA
+   */
+
+  document
+    .querySelectorAll('.quick-actions button')
+    .forEach(button => {
+
+      button.addEventListener('click', () => {
+
+        const text =
+          button.textContent.toLowerCase();
+
+        if (text.includes('eventos')) {
+
+          closeChat();
+
+          location.hash = 'eventos';
+
+        } else if (text.includes('comunidade')) {
+
+          closeChat();
+
+          openModal('signup');
+
+        } else if (text.includes('dúvida')) {
+
+          const input = $('#chat-input');
+
+          if (input) {
+
+            input.focus();
+
+            toast(
+              'Digite sua dúvida no campo abaixo.'
+            );
+
+          }
+
+        } else if (text.includes('equipe')) {
+
+          closeChat();
+
+          toast(
+            'Em breve você poderá falar diretamente com nossa equipe.'
+          );
+
+        }
+
+      });
+
+    });
+
+
+  /*
+   * ESC FECHA A IA
+   */
+
+  document.addEventListener('keydown', event => {
+
+    if (event.key === 'Escape') {
+
+      closeChat();
+
+    }
+
+  });
+
+}
+
+
+/* =========================================================
+   CABEÇALHO
+   ========================================================= */
+
 function renderHeader() {
+
   const b = $('#auth-trigger');
 
   if (!b) return;
 
   if (session) {
-    b.textContent = `Olá, ${session.name.split(' ')[0]} ▾`;
+
+    b.textContent =
+      `Olá, ${session.name.split(' ')[0]} ▾`;
 
     b.onclick = () => {
+
       location.hash = 'admin';
+
       renderAdmin();
+
     };
+
   } else {
-    b.textContent = 'Entrar / Cadastrar';
+
+    b.textContent =
+      'Entrar / Cadastrar';
 
     b.onclick = () => {
+
       openModal('login');
+
     };
+
   }
+
 }
 
+
+/* =========================================================
+   POPULAÇÃO
+   ========================================================= */
+
 function renderPopulation() {
+
   const members = users.filter(
     u =>
       u.role === 'student' ||
@@ -123,39 +412,60 @@ function renderPopulation() {
   const avatars = $('#member-avatars');
 
   if (count) {
-    count.textContent = members.length;
+
+    count.textContent =
+      members.length;
+
   }
 
   if (avatars) {
-    avatars.innerHTML = members
-      .slice(0, 5)
-      .map(
-        u =>
-          `<b title="${escapeHTML(u.name)}">${escapeHTML(
-            u.name[0]
-          )}</b>`
-      )
-      .join('');
+
+    avatars.innerHTML =
+      members
+        .slice(0, 5)
+        .map(
+          u =>
+            `<b title="${escapeHTML(u.name)}">${escapeHTML(
+              u.name[0]
+            )}</b>`
+        )
+        .join('');
+
   }
+
 }
 
+
+/* =========================================================
+   EVENTO EM DESTAQUE
+   ========================================================= */
+
 function renderFeatured() {
+
   const e = eventInFocus();
   const holder = $('#featured-event');
 
   if (!holder) return;
 
   if (!e) {
+
     holder.innerHTML = `
       <div class="event-empty">
-        <h3>Nenhum evento programado.</h3>
+
+        <h3>
+          Nenhum evento programado.
+        </h3>
+
         <p>
-          Volte em breve para acompanhar as próximas experiências.
+          Volte em breve para acompanhar
+          as próximas experiências.
         </p>
+
       </div>
     `;
 
     return;
+
   }
 
   const enrolled =
@@ -167,6 +477,7 @@ function renderFeatured() {
     );
 
   holder.innerHTML = `
+
     <div class="event-copy">
 
       <span class="event-label">
@@ -202,25 +513,46 @@ function renderFeatured() {
         data-enroll="${e.id}"
         ${enrolled ? 'disabled' : ''}
       >
+
         ${
           enrolled
             ? 'Inscrição confirmada ✓'
             : 'Saiba mais &nbsp; →'
         }
+
       </button>
 
     </div>
 
     <div class="event-decoration"></div>
+
   `;
+
 }
+
+
+/* =========================================================
+   PROTEÇÃO ADMIN
+   ========================================================= */
 
 function adminGuard() {
-  return session && session.role === 'admin';
+
+  return (
+    session &&
+    session.role === 'admin'
+  );
+
 }
 
+
+/* =========================================================
+   FORMULÁRIO DE EVENTO
+   ========================================================= */
+
 function eventForm() {
+
   return `
+
     <form id="event-form">
 
       <input
@@ -236,6 +568,7 @@ function eventForm() {
           required
           placeholder="Ex.: Fono Experience 2026"
         />
+
       </label>
 
       <div class="form-row">
@@ -248,6 +581,7 @@ function eventForm() {
             type="date"
             required
           />
+
         </label>
 
         <label>
@@ -268,11 +602,13 @@ function eventForm() {
             </option>
 
           </select>
+
         </label>
 
       </div>
 
       <label>
+
         Local
 
         <input
@@ -280,9 +616,11 @@ function eventForm() {
           required
           placeholder="Natal, RN"
         />
+
       </label>
 
       <label>
+
         Descrição
 
         <textarea
@@ -290,6 +628,7 @@ function eventForm() {
           required
           placeholder="O que torna este evento especial?"
         ></textarea>
+
       </label>
 
       <label class="checkbox">
@@ -324,11 +663,20 @@ function eventForm() {
       </div>
 
     </form>
+
   `;
+
 }
 
+
+/* =========================================================
+   LISTA DE EVENTOS
+   ========================================================= */
+
 function eventList() {
+
   return `
+
     <div class="event-list">
 
       <h3>
@@ -345,20 +693,26 @@ function eventList() {
               )
               .map(
                 e => `
+
                   <div class="event-row">
 
                     <div>
 
                       <strong>
+
                         ${escapeHTML(e.title)}
-                        ${e.featured ? '☆' : ''}
+
+                        ${e.featured ? ' ☆' : ''}
+
                       </strong>
 
                       <small>
+
                         ${dateFormat(e.date)}
                         ·
                         ${escapeHTML(e.place)}
                         ·
+
                         ${
                           e.status === 'scheduled'
                             ? 'Programado'
@@ -366,6 +720,7 @@ function eventList() {
                             ? 'Rascunho'
                             : 'Encerrado'
                         }
+
                       </small>
 
                     </div>
@@ -388,6 +743,7 @@ function eventList() {
                     </div>
 
                   </div>
+
                 `
               )
               .join('')
@@ -395,11 +751,20 @@ function eventList() {
       }
 
     </div>
+
   `;
+
 }
 
+
+/* =========================================================
+   ADMIN
+   ========================================================= */
+
 function manager() {
+
   return `
+
     <div class="member-top">
 
       <span class="member-avatar">
@@ -427,6 +792,7 @@ function manager() {
 
     </div>
 
+
     <div class="manager-tabs">
 
       <button
@@ -452,6 +818,7 @@ function manager() {
 
     </div>
 
+
     <div id="manager-content">
 
       <div class="event-manager">
@@ -465,23 +832,35 @@ function manager() {
       </div>
 
     </div>
+
   `;
+
 }
 
+
+/* =========================================================
+   PAINEL DO USUÁRIO
+   ========================================================= */
+
 function userDashboard() {
-  const mine = enrollments
-    .filter(
-      x => x.userId === session.id
-    )
-    .map(
-      x =>
-        events.find(
-          e => e.id === x.eventId
-        )
-    )
-    .filter(Boolean);
+
+  const mine =
+    enrollments
+      .filter(
+        x =>
+          x.userId === session.id
+      )
+      .map(
+        x =>
+          events.find(
+            e =>
+              e.id === x.eventId
+          )
+      )
+      .filter(Boolean);
 
   return `
+
     <div class="member-dashboard">
 
       <div class="member-top">
@@ -497,12 +876,15 @@ function userDashboard() {
           </strong>
 
           <small>
+
             ${
               session.role === 'teacher'
                 ? 'Professor(a)'
                 : 'Estudante'
             }
+
             CONECT
+
           </small>
 
         </div>
@@ -516,15 +898,18 @@ function userDashboard() {
 
       </div>
 
+
       <h3>
         Minhas inscrições
       </h3>
+
 
       ${
         mine.length
           ? mine
               .map(
                 e => `
+
                   <div class="event-row">
 
                     <div>
@@ -548,28 +933,46 @@ function userDashboard() {
                     </button>
 
                   </div>
+
                 `
               )
               .join('')
           : `
+
             <p class="empty-note">
-              Você ainda não está inscrito em eventos.
-              Escolha uma experiência em destaque para participar.
+
+              Você ainda não está inscrito
+              em eventos.
+
+              Escolha uma experiência
+              em destaque para participar.
+
             </p>
+
           `
       }
 
     </div>
+
   `;
+
 }
 
+
+/* =========================================================
+   RENDER ADMIN
+   ========================================================= */
+
 function renderAdmin() {
+
   const panel = $('#admin-panel');
 
   if (!panel) return;
 
   if (!session) {
+
     panel.innerHTML = `
+
       <div class="locked">
 
         <h3>
@@ -577,8 +980,11 @@ function renderAdmin() {
         </h3>
 
         <p>
-          Faça seu cadastro para se inscrever em eventos
-          e acompanhar sua jornada CONECT.
+
+          Faça seu cadastro para se
+          inscrever em eventos e
+          acompanhar sua jornada CONECT.
+
         </p>
 
         <button
@@ -589,100 +995,151 @@ function renderAdmin() {
         </button>
 
       </div>
+
     `;
 
-    const loginButton = $('#locked-login');
+    const loginButton =
+      $('#locked-login');
 
     if (loginButton) {
-      loginButton.onclick = () => {
-        openModal('login');
-      };
+
+      loginButton.onclick =
+        () => openModal('login');
+
     }
 
     return;
+
   }
+
 
   panel.innerHTML =
     adminGuard()
       ? manager()
       : userDashboard();
 
+
   if (adminGuard()) {
+
     bindAdmin();
 
-    // Um único listener para todas as abas do administrador.
-    // Não é substituído quando o conteúdo de Pessoas/Inscrições é renderizado.
     panel.onclick = adminClick;
+
   } else {
-    panel.onclick = null;
+
     bindMember();
+
   }
-}
 
-function signOut() {
-  session = null;
-
-  persist();
-
-  renderHeader();
-  renderFeatured();
-  renderAdmin();
-
-  toast('Você saiu da sua conta.');
 }
 
 
 /* =========================================================
-   ADMIN
+   ADMIN - FUNÇÕES
    ========================================================= */
 
 function bindAdmin() {
-  const form = $('#event-form');
+
+  const form =
+    $('#event-form');
 
   if (form) {
+
     form.onsubmit = ev => {
+
       ev.preventDefault();
 
-      const id = $('#event-id').value;
+      const id =
+        $('#event-id').value;
 
       const item = {
-        id: id || uid(),
-        title: $('#title').value.trim(),
-        date: $('#date').value,
-        place: $('#place').value.trim(),
-        description: $('#description').value.trim(),
-        status: $('#status').value,
-        featured: $('#featured').checked
+
+        id:
+          id || uid(),
+
+        title:
+          $('#title').value.trim(),
+
+        date:
+          $('#date').value,
+
+        place:
+          $('#place').value.trim(),
+
+        description:
+          $('#description').value.trim(),
+
+        status:
+          $('#status').value,
+
+        featured:
+          $('#featured').checked
+
       };
 
+
       if (item.featured) {
-        events.forEach(e => (e.featured = false));
+
+        events.forEach(
+          e =>
+            e.featured = false
+        );
+
       }
+
 
       if (id) {
-        events = events.map(e => e.id === id ? item : e);
+
+        events =
+          events.map(
+            e =>
+              e.id === id
+                ? item
+                : e
+          );
+
       } else {
+
         events.push(item);
+
       }
 
+
       persist();
+
       renderFeatured();
       renderAdmin();
-      toast('Evento salvo com sucesso.');
+
+      toast(
+        'Evento salvo com sucesso.'
+      );
+
     };
+
   }
 
-  const logout = $('#logout');
+
+  const logout =
+    $('#logout');
 
   if (logout) {
-    logout.onclick = signOut;
+
+    logout.onclick =
+      signOut;
+
   }
 
-  const cancelEdit = $('#cancel-edit');
+
+  const cancelEdit =
+    $('#cancel-edit');
 
   if (cancelEdit) {
-    cancelEdit.onclick = () => renderAdmin();
+
+    cancelEdit.onclick =
+      () => renderAdmin();
+
   }
+
 }
 
 
@@ -691,95 +1148,227 @@ function bindAdmin() {
    ========================================================= */
 
 function adminClick(ev) {
-  const managerButton = ev.target.closest('[data-manager]');
+
+  const managerButton =
+    ev.target.closest(
+      '[data-manager]'
+    );
 
   if (managerButton) {
+
     ev.preventDefault();
-    renderManagerSection(managerButton.dataset.manager);
+
+    renderManagerSection(
+      managerButton.dataset.manager
+    );
+
     return;
+
   }
 
-  const removeUserButton = ev.target.closest('[data-remove-user]');
+
+  const removeUserButton =
+    ev.target.closest(
+      '[data-remove-user]'
+    );
 
   if (removeUserButton) {
-    const id = removeUserButton.dataset.removeUser;
 
-    if (id && confirm('Remover este cadastro?')) {
-      users = users.filter(u => u.id !== id);
-      enrollments = enrollments.filter(x => x.userId !== id);
+    const id =
+      removeUserButton.dataset.removeUser;
+
+    if (
+      id &&
+      confirm(
+        'Remover este cadastro?'
+      )
+    ) {
+
+      users =
+        users.filter(
+          u => u.id !== id
+        );
+
+      enrollments =
+        enrollments.filter(
+          x =>
+            x.userId !== id
+        );
 
       persist();
+
       renderPopulation();
-      renderManagerSection('people');
-      toast('Cadastro removido.');
+
+      renderManagerSection(
+        'people'
+      );
+
+      toast(
+        'Cadastro removido.'
+      );
+
     }
 
     return;
+
   }
+
 
   const removeEnrollmentButton =
-    ev.target.closest('[data-remove-enrollment]');
+    ev.target.closest(
+      '[data-remove-enrollment]'
+    );
 
   if (removeEnrollmentButton) {
-    const id = removeEnrollmentButton.dataset.removeEnrollment;
 
-    if (id && confirm('Cancelar esta inscrição?')) {
-      enrollments = enrollments.filter(x => x.id !== id);
+    const id =
+      removeEnrollmentButton.dataset
+        .removeEnrollment;
+
+    if (
+      id &&
+      confirm(
+        'Cancelar esta inscrição?'
+      )
+    ) {
+
+      enrollments =
+        enrollments.filter(
+          x => x.id !== id
+        );
 
       persist();
-      renderManagerSection('enrollments');
-      toast('Inscrição cancelada.');
+
+      renderManagerSection(
+        'enrollments'
+      );
+
+      toast(
+        'Inscrição cancelada.'
+      );
+
     }
 
     return;
+
   }
 
-  const deleteButton = ev.target.closest('[data-delete]');
+
+  const deleteButton =
+    ev.target.closest(
+      '[data-delete]'
+    );
 
   if (deleteButton) {
-    const id = deleteButton.dataset.delete;
 
-    if (id && confirm('Excluir este evento?')) {
-      events = events.filter(e => e.id !== id);
-      enrollments = enrollments.filter(x => x.eventId !== id);
+    const id =
+      deleteButton.dataset.delete;
+
+    if (
+      id &&
+      confirm(
+        'Excluir este evento?'
+      )
+    ) {
+
+      events =
+        events.filter(
+          e => e.id !== id
+        );
+
+      enrollments =
+        enrollments.filter(
+          x =>
+            x.eventId !== id
+        );
 
       persist();
+
       renderFeatured();
       renderAdmin();
-      toast('Evento excluído.');
+
+      toast(
+        'Evento excluído.'
+      );
+
     }
 
     return;
+
   }
 
-  const editButton = ev.target.closest('[data-edit]');
+
+  const editButton =
+    ev.target.closest(
+      '[data-edit]'
+    );
 
   if (editButton) {
-    const id = editButton.dataset.edit;
-    const e = events.find(x => x.id === id);
+
+    const id =
+      editButton.dataset.edit;
+
+    const e =
+      events.find(
+        x => x.id === id
+      );
 
     if (!e) return;
 
-    const eventId = $('#event-id');
-    const title = $('#title');
-    const date = $('#date');
-    const place = $('#place');
-    const description = $('#description');
-    const status = $('#status');
-    const featured = $('#featured');
-    const cancel = $('#cancel-edit');
 
-    if (eventId) eventId.value = e.id;
-    if (title) title.value = e.title;
-    if (date) date.value = e.date;
-    if (place) place.value = e.place;
-    if (description) description.value = e.description;
-    if (status) status.value = e.status;
-    if (featured) featured.checked = e.featured;
-    if (cancel) cancel.hidden = false;
+    const eventId =
+      $('#event-id');
 
-    return;
+    const title =
+      $('#title');
+
+    const date =
+      $('#date');
+
+    const place =
+      $('#place');
+
+    const description =
+      $('#description');
+
+    const status =
+      $('#status');
+
+    const featured =
+      $('#featured');
+
+    const cancel =
+      $('#cancel-edit');
+
+
+    if (eventId)
+      eventId.value = e.id;
+
+    if (title)
+      title.value = e.title;
+
+    if (date)
+      date.value = e.date;
+
+    if (place)
+      place.value = e.place;
+
+    if (description)
+      description.value =
+        e.description;
+
+    if (status)
+      status.value = e.status;
+
+    if (featured)
+      featured.checked =
+        e.featured;
+
+    if (cancel)
+      cancel.hidden = false;
+
   }
+
 }
 
 
@@ -788,52 +1377,89 @@ function adminClick(ev) {
    ========================================================= */
 
 function renderManagerSection(tab) {
-  const content = $('#manager-content');
+
+  const content =
+    $('#manager-content');
 
   if (!content) return;
 
-  document.querySelectorAll('.manager-tab').forEach(button => {
-    button.classList.toggle(
-      'active',
-      button.dataset.manager === tab
-    );
-  });
+
+  document
+    .querySelectorAll(
+      '.manager-tab'
+    )
+    .forEach(button => {
+
+      button.classList.toggle(
+        'active',
+        button.dataset.manager === tab
+      );
+
+    });
+
 
   if (tab === 'events') {
+
     content.innerHTML = `
+
       <div class="event-manager">
+
         <div>
           ${eventForm()}
         </div>
+
         ${eventList()}
+
       </div>
+
     `;
 
     bindAdmin();
+
     return;
+
   }
 
+
   if (tab === 'people') {
+
     content.innerHTML = `
+
       <div class="manager-list">
-        <h3>Cadastros</h3>
+
+        <h3>
+          Cadastros
+        </h3>
 
         ${
           users
-            .filter(u => u.role !== 'admin')
+            .filter(
+              u =>
+                u.role !== 'admin'
+            )
             .map(
               u => `
+
                 <div class="event-row">
+
                   <div>
-                    <strong>${escapeHTML(u.name)}</strong>
+
+                    <strong>
+                      ${escapeHTML(u.name)}
+                    </strong>
 
                     <small>
+
                       ${escapeHTML(u.email)}
                       ·
-                      ${u.role === 'teacher' ? 'Professor(a)' : 'Estudante'}
-                      · desde
-                      ${dateFormat(u.createdAt.slice(0, 10))}
+                      ${
+                        u.role === 'teacher'
+                          ? 'Professor(a)'
+                          : 'Estudante'
+                      }
+
                     </small>
+
                   </div>
 
                   <button
@@ -842,46 +1468,83 @@ function renderManagerSection(tab) {
                   >
                     Remover
                   </button>
+
                 </div>
+
               `
             )
             .join('') ||
           '<p>Nenhum cadastro ainda.</p>'
         }
+
       </div>
+
     `;
 
     return;
+
   }
 
+
   if (tab === 'enrollments') {
-    const rows = enrollments
-      .map(en => ({
-        en,
-        u: users.find(u => u.id === en.userId),
-        e: events.find(e => e.id === en.eventId)
-      }))
-      .filter(x => x.u && x.e);
+
+    const rows =
+      enrollments
+        .map(en => ({
+
+          en,
+
+          u:
+            users.find(
+              u =>
+                u.id === en.userId
+            ),
+
+          e:
+            events.find(
+              e =>
+                e.id === en.eventId
+            )
+
+        }))
+        .filter(
+          x =>
+            x.u &&
+            x.e
+        );
+
 
     content.innerHTML = `
+
       <div class="manager-list">
-        <h3>Inscrições</h3>
+
+        <h3>
+          Inscrições
+        </h3>
 
         ${
           rows
             .map(
               x => `
+
                 <div class="event-row">
+
                   <div>
-                    <strong>${escapeHTML(x.u.name)}</strong>
+
+                    <strong>
+                      ${escapeHTML(x.u.name)}
+                    </strong>
 
                     <small>
+
                       ${escapeHTML(x.e.title)}
                       ·
                       ${dateFormat(x.e.date)}
                       ·
                       ${escapeHTML(x.u.email)}
+
                     </small>
+
                   </div>
 
                   <button
@@ -890,17 +1553,21 @@ function renderManagerSection(tab) {
                   >
                     Cancelar
                   </button>
+
                 </div>
+
               `
             )
             .join('') ||
           '<p>Nenhuma inscrição ainda.</p>'
         }
+
       </div>
+
     `;
 
-    return;
   }
+
 }
 
 
@@ -908,21 +1575,24 @@ function renderManagerSection(tab) {
    ÁREA DO MEMBRO
    ========================================================= */
 
-
 function bindMember() {
 
   const logout =
     $('#logout');
 
   if (logout) {
+
     logout.onclick =
       signOut;
+
   }
+
 
   const panel =
     $('#admin-panel');
 
   if (!panel) return;
+
 
   panel.onclick = e => {
 
@@ -933,9 +1603,11 @@ function bindMember() {
 
     if (!button) return;
 
+
     const eventId =
       button.dataset
         .cancelEnrollment;
+
 
     if (eventId) {
 
@@ -943,12 +1615,11 @@ function bindMember() {
         enrollments.filter(
           x =>
             !(
-              x.userId ===
-                session.id &&
-              x.eventId ===
-                eventId
+              x.userId === session.id &&
+              x.eventId === eventId
             )
         );
+
 
       persist();
 
@@ -958,9 +1629,32 @@ function bindMember() {
       toast(
         'Inscrição cancelada.'
       );
+
     }
 
   };
+
+}
+
+
+/* =========================================================
+   SAIR
+   ========================================================= */
+
+function signOut() {
+
+  session = null;
+
+  persist();
+
+  renderHeader();
+  renderFeatured();
+  renderAdmin();
+
+  toast(
+    'Você saiu da sua conta.'
+  );
+
 }
 
 
@@ -985,7 +1679,9 @@ function openModal(tab) {
   );
 
   switchTab(tab);
+
 }
+
 
 function closeModal() {
 
@@ -1002,7 +1698,9 @@ function closeModal() {
     'aria-hidden',
     'true'
   );
+
 }
+
 
 function switchTab(tab) {
 
@@ -1010,12 +1708,15 @@ function switchTab(tab) {
     .querySelectorAll(
       '.auth-tabs .tab'
     )
-    .forEach(x =>
+    .forEach(x => {
+
       x.classList.toggle(
         'active',
         x.dataset.tab === tab
-      )
-    );
+      );
+
+    });
+
 
   const login =
     $('#login-form');
@@ -1023,13 +1724,16 @@ function switchTab(tab) {
   const signup =
     $('#signup-form');
 
+
   if (login) {
 
     login.classList.toggle(
       'hidden',
       tab !== 'login'
     );
+
   }
+
 
   if (signup) {
 
@@ -1037,38 +1741,82 @@ function switchTab(tab) {
       'hidden',
       tab !== 'signup'
     );
+
   }
+
 }
 
 
-const authModal =
-  $('#auth-modal');
+/* =========================================================
+   MODAL
+   ========================================================= */
 
-if (authModal) {
+function initAuthModal() {
+
+  const authModal =
+    $('#auth-modal');
+
+  if (!authModal) return;
+
 
   authModal.onclick = e => {
 
     if (
       e.target ===
-        e.currentTarget ||
-      e.target.dataset
-        .closeModal !==
-        undefined
+      e.currentTarget
     ) {
 
       closeModal();
+
+      return;
+
     }
 
+
     if (
-      e.target.dataset.tab
+      e.target.closest(
+        '[data-close-modal]'
+      )
     ) {
 
-      switchTab(
-        e.target.dataset.tab
+      closeModal();
+
+      return;
+
+    }
+
+
+    const tabButton =
+      e.target.closest(
+        '[data-tab]'
       );
+
+    if (tabButton) {
+
+      switchTab(
+        tabButton.dataset.tab
+      );
+
     }
 
   };
+
+
+  document.addEventListener(
+    'keydown',
+    e => {
+
+      if (
+        e.key === 'Escape'
+      ) {
+
+        closeModal();
+
+      }
+
+    }
+  );
+
 }
 
 
@@ -1076,71 +1824,93 @@ if (authModal) {
    LOGIN
    ========================================================= */
 
-const loginForm =
-  $('#login-form');
+function initLogin() {
 
-if (loginForm) {
+  const loginForm =
+    $('#login-form');
 
-  loginForm.onsubmit = e => {
+  if (!loginForm) return;
 
-    e.preventDefault();
 
-    const email =
-      $('#login-email')
-        .value
-        .trim()
-        .toLowerCase();
+  loginForm.onsubmit =
+    e => {
 
-    const password =
-      $('#login-password')
-        .value;
+      e.preventDefault();
 
-    const found =
-      users.find(
-        u =>
-          u.email
-            .toLowerCase() ===
-            email &&
-          u.password ===
-            password
+
+      const email =
+        $('#login-email')
+          .value
+          .trim()
+          .toLowerCase();
+
+
+      const password =
+        $('#login-password')
+          .value;
+
+
+      const found =
+        users.find(
+          u =>
+            u.email
+              .toLowerCase() ===
+              email &&
+            u.password ===
+              password
+        );
+
+
+      if (!found) {
+
+        const message =
+          $('#login-message');
+
+        if (message) {
+
+          message.textContent =
+            'E-mail ou senha incorretos.';
+
+        }
+
+        return;
+
+      }
+
+
+      session = {
+
+        id:
+          found.id,
+
+        name:
+          found.name,
+
+        role:
+          found.role,
+
+        email:
+          found.email
+
+      };
+
+
+      persist();
+
+      closeModal();
+
+      renderHeader();
+      renderFeatured();
+      renderAdmin();
+
+      toast(
+        `Bem-vindo(a), ${
+          session.name.split(' ')[0]
+        }!`
       );
-
-    if (!found) {
-
-      $('#login-message')
-        .textContent =
-        'E-mail ou senha incorretos.';
-
-      return;
-    }
-
-    session = {
-
-      id: found.id,
-
-      name: found.name,
-
-      role: found.role,
-
-      email: found.email
 
     };
 
-    persist();
-
-    closeModal();
-
-    renderHeader();
-    renderFeatured();
-    renderAdmin();
-
-    toast(
-      `Bem-vindo(a), ${
-        session.name.split(' ')[0]
-      }!`
-    );
-
-  };
 }
 
 
@@ -1148,99 +1918,125 @@ if (loginForm) {
    CADASTRO
    ========================================================= */
 
-const signupForm =
-  $('#signup-form');
+function initSignup() {
 
-if (signupForm) {
+  const signupForm =
+    $('#signup-form');
 
-  signupForm.onsubmit = e => {
+  if (!signupForm) return;
 
-    e.preventDefault();
 
-    const email =
-      $('#signup-email')
-        .value
-        .trim()
-        .toLowerCase();
+  signupForm.onsubmit =
+    e => {
 
-    if (
-      users.some(
-        u =>
-          u.email
-            .toLowerCase() ===
-          email
-      )
-    ) {
+      e.preventDefault();
 
-      $('#signup-message')
-        .textContent =
-        'Este e-mail já possui uma conta.';
 
-      return;
-    }
-
-    const u = {
-
-      id: uid(),
-
-      name:
-        $('#signup-name')
+      const email =
+        $('#signup-email')
           .value
-          .trim(),
+          .trim()
+          .toLowerCase();
 
-      email,
 
-      password:
-        $('#signup-password')
-          .value,
+      if (
+        users.some(
+          u =>
+            u.email
+              .toLowerCase() ===
+            email
+        )
+      ) {
 
-      role:
-        $('#signup-role')
-          .value,
+        const message =
+          $('#signup-message');
 
-      createdAt:
-        new Date().toISOString()
+        if (message) {
+
+          message.textContent =
+            'Este e-mail já possui uma conta.';
+
+        }
+
+        return;
+
+      }
+
+
+      const u = {
+
+        id:
+          uid(),
+
+        name:
+          $('#signup-name')
+            .value
+            .trim(),
+
+        email,
+
+        password:
+          $('#signup-password')
+            .value,
+
+        role:
+          $('#signup-role')
+            .value,
+
+        createdAt:
+          new Date().toISOString()
+
+      };
+
+
+      users.push(u);
+
+
+      session = {
+
+        id:
+          u.id,
+
+        name:
+          u.name,
+
+        role:
+          u.role,
+
+        email:
+          u.email
+
+      };
+
+
+      persist();
+
+      closeModal();
+
+      renderHeader();
+      renderPopulation();
+      renderAdmin();
+
+      toast(
+        'Sua conta foi criada. Bem-vindo(a)!'
+      );
 
     };
 
-    users.push(u);
-
-    session = {
-
-      id: u.id,
-
-      name: u.name,
-
-      role: u.role,
-
-      email: u.email
-
-    };
-
-    persist();
-
-    closeModal();
-
-    renderHeader();
-    renderPopulation();
-    renderAdmin();
-
-    toast(
-      'Sua conta foi criada. Bem-vindo(a)!'
-    );
-
-  };
 }
 
 
 /* =========================================================
-   EVENTO EM DESTAQUE
+   CLIQUE NO EVENTO
    ========================================================= */
 
-const featured =
-  $('#featured-event');
+function initFeaturedEvent() {
 
-if (featured) {
+  const featured =
+    $('#featured-event');
+
+  if (!featured) return;
+
 
   featured.onclick = e => {
 
@@ -1251,10 +2047,12 @@ if (featured) {
 
     if (!button) return;
 
+
     const eventId =
       button.dataset.enroll;
 
     if (!eventId) return;
+
 
     if (!session) {
 
@@ -1265,24 +2063,27 @@ if (featured) {
       );
 
       return;
+
     }
+
 
     if (
       enrollments.some(
         x =>
-          x.eventId ===
-            eventId &&
-          x.userId ===
-            session.id
+          x.eventId === eventId &&
+          x.userId === session.id
       )
     ) {
 
       return;
+
     }
+
 
     enrollments.push({
 
-      id: uid(),
+      id:
+        uid(),
 
       eventId,
 
@@ -1294,6 +2095,7 @@ if (featured) {
 
     });
 
+
     persist();
 
     renderFeatured();
@@ -1304,140 +2106,7 @@ if (featured) {
     );
 
   };
-}
 
-
-/* =========================================================
-   LOGO
-   ========================================================= */
-
-.brand-mark {
-  position: absolute;
-  left: 0;
-  top: -7px;
-  width: 40px;
-  height: 46px;
-  object-fit: cover;
-}
-
-
-/* =========================================================
-   CONECT IA
-   ========================================================= */
-
-.chat-box {
-  top: auto;
-  bottom: 78px;
-  max-height: calc(100vh - 100px);
-  overflow-y: auto;
-  overflow-x: hidden;
-}
-
-/* IMPORTANTE:
-   não colocar display:block!important aqui.
-   O JavaScript precisa conseguir esconder a janela.
-*/
-
-
-.chat-box .quick-actions {
-  padding-bottom: 4px;
-}
-
-
-/* =========================================================
-   TABLET / CELULAR
-   ========================================================= */
-
-@media (max-width: 1000px) {
-
-  .chat-box {
-    width: 220px;
-    right: 18px;
-  }
-
-}
-
-
-/* =========================================================
-   CELULAR
-   ========================================================= */
-
-@media (max-width: 500px) {
-
-  .chat-box {
-    width: calc(100% - 28px);
-    right: 14px;
-    bottom: 70px;
-  }
-
-}
-
-
-/* =========================================================
-   AÇÕES RÁPIDAS
-   ========================================================= */
-
-document
-  .querySelectorAll(
-    '.quick-actions button'
-  )
-  .forEach(
-    b =>
-      (b.onclick = () => {
-
-        const text =
-          b.textContent
-            .toLowerCase();
-
-        if (
-          text.includes(
-            'eventos'
-          )
-        ) {
-
-          location.hash =
-            'eventos';
-
-        } else if (
-          text.includes(
-            'comunidade'
-          )
-        ) {
-
-          openModal(
-            'signup'
-          );
-
-        }
-
-      })
-  );
-
-
-/* =========================================================
-   MENU MOBILE
-   ========================================================= */
-
-const menuToggle =
-  $('.menu-toggle');
-
-if (menuToggle) {
-
-  menuToggle.onclick =
-    () => {
-
-      const nav =
-        $('#main-nav');
-
-      if (nav) {
-
-        nav.classList.toggle(
-          'open'
-        );
-
-      }
-
-    };
 }
 
 
@@ -1445,9 +2114,31 @@ if (menuToggle) {
    INICIALIZAÇÃO
    ========================================================= */
 
-persist();
+document.addEventListener(
+  'DOMContentLoaded',
+  () => {
 
-renderHeader();
-renderPopulation();
-renderFeatured();
-renderAdmin();
+    persist();
+
+    initMobileMenu();
+
+    initChat();
+
+    initAuthModal();
+
+    initLogin();
+
+    initSignup();
+
+    initFeaturedEvent();
+
+    renderHeader();
+
+    renderPopulation();
+
+    renderFeatured();
+
+    renderAdmin();
+
+  }
+);
