@@ -1308,193 +1308,67 @@ if (featured) {
 
 
 /* =========================================================
-   CHAT - CONECT IA
+   LOGO
    ========================================================= */
 
-const chatToggle = $('#chat-toggle');
-const chatBox = $('#chat-box');
-const closeChat = $('#close-chat');
-const chatForm = $('#chat-form');
-
-
-/* =========================
-   ABRIR CHAT
-   ========================= */
-
-function openChat() {
-
-  if (!chatBox) return;
-
-  chatBox.classList.add('open');
-
-  chatBox.setAttribute(
-    'aria-hidden',
-    'false'
-  );
-
+.brand-mark {
+  position: absolute;
+  left: 0;
+  top: -7px;
+  width: 40px;
+  height: 46px;
+  object-fit: cover;
 }
 
 
-/* =========================
-   FECHAR CHAT
-   ========================= */
+/* =========================================================
+   CONECT IA
+   ========================================================= */
 
-function closeChatBox() {
+.chat-box {
+  top: auto;
+  bottom: 78px;
+  max-height: calc(100vh - 100px);
+  overflow-y: auto;
+  overflow-x: hidden;
+}
 
-  if (!chatBox) return;
+/* IMPORTANTE:
+   não colocar display:block!important aqui.
+   O JavaScript precisa conseguir esconder a janela.
+*/
 
-  chatBox.classList.remove('open');
 
-  chatBox.setAttribute(
-    'aria-hidden',
-    'true'
-  );
-
+.chat-box .quick-actions {
+  padding-bottom: 4px;
 }
 
 
-/* =========================
-   BOTÃO DA IA
-   ========================= */
+/* =========================================================
+   TABLET / CELULAR
+   ========================================================= */
 
-if (chatToggle) {
+@media (max-width: 1000px) {
 
-  chatToggle.addEventListener(
-    'click',
-    function (event) {
-
-      event.preventDefault();
-      event.stopPropagation();
-
-      if (
-        chatBox &&
-        chatBox.classList.contains('open')
-      ) {
-
-        closeChatBox();
-
-      } else {
-
-        openChat();
-
-      }
-
-    }
-  );
-
-}
-
-
-/* =========================
-   BOTÃO X
-   ========================= */
-
-if (closeChat) {
-
-  closeChat.addEventListener(
-    'click',
-    function (event) {
-
-      event.preventDefault();
-      event.stopPropagation();
-
-      closeChatBox();
-
-    }
-  );
-
-
-  /* Compatibilidade com celular */
-
-  closeChat.addEventListener(
-    'touchend',
-    function (event) {
-
-      event.preventDefault();
-      event.stopPropagation();
-
-      closeChatBox();
-
-    },
-    {
-      passive: false
-    }
-  );
-
-}
-
-
-/* =========================
-   FECHAR CLICANDO FORA
-   ========================= */
-
-if (chatBox) {
-
-  chatBox.addEventListener(
-    'click',
-    function (event) {
-
-      if (
-        event.target === chatBox
-      ) {
-
-        closeChatBox();
-
-      }
-
-    }
-  );
-
-}
-
-
-/* =========================
-   ESC NO COMPUTADOR
-   ========================= */
-
-document.addEventListener(
-  'keydown',
-  function (event) {
-
-    if (
-      event.key === 'Escape'
-    ) {
-
-      closeChatBox();
-
-    }
-
+  .chat-box {
+    width: 220px;
+    right: 18px;
   }
-);
+
+}
 
 
-/* =========================
-   FORMULÁRIO DA IA
-   ========================= */
+/* =========================================================
+   CELULAR
+   ========================================================= */
 
-if (chatForm) {
+@media (max-width: 500px) {
 
-  chatForm.onsubmit = function (event) {
-
-    event.preventDefault();
-
-    const input =
-      $('#chat-input');
-
-    if (!input) return;
-
-    const text =
-      input.value.trim();
-
-    if (!text) return;
-
-    toast(
-      'Recebemos sua mensagem! A CONECT IA responderá em breve.'
-    );
-
-    input.value = '';
-
-  };
+  .chat-box {
+    width: calc(100% - 28px);
+    right: 14px;
+    bottom: 70px;
+  }
 
 }
 
