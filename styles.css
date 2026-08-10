@@ -236,33 +236,33 @@ a {
 .hero-art {
   position: relative;
 
-  /*
-    A imagem fica presa no lado direito.
-    O degradê suaviza a passagem entre
-    o texto e a fotografia.
-  */
   background-image:
     linear-gradient(
       90deg,
       #f7f8ff 0%,
-      #f7f8ff 5%,
-      rgba(247, 248, 255, .98) 14%,
-      rgba(247, 248, 255, .90) 25%,
-      rgba(247, 248, 255, .65) 37%,
-      rgba(247, 248, 255, .30) 50%,
-      rgba(247, 248, 255, 0) 68%
+      rgba(247,248,255,.99) 12%,
+      rgba(247,248,255,.90) 25%,
+      rgba(247,248,255,.65) 38%,
+      rgba(247,248,255,.30) 52%,
+      rgba(247,248,255,0) 70%
     ),
     url("assets/hero-team.png");
 
   background-repeat: no-repeat;
 
+  /*
+     IMPORTANTE:
+     100% 100% faz a imagem ocupar exatamente
+     toda a área disponível, sem cortar as pessoas
+     das extremidades.
+  */
   background-size:
     100% 100%,
-    100% 100%,
+    100% 100%;
 
   background-position:
     center,
-    right center;
+    center;
 }
 
 .eyebrow {
