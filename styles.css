@@ -208,170 +208,69 @@ a {
 
 
 /* =========================================================
-   HERO
+   HERO — IMAGEM COMPLETA
    ========================================================= */
-
-.hero {
-  display: grid;
-
-  grid-template-columns:
-    42% 58%;
-
-  height: 501px;
-
-  margin-top: -15px;
-}
-
-.hero-copy {
-  padding: 38px 20px 0 5.05vw;
-
-  background:
-    linear-gradient(
-      112deg,
-      #fff 25%,
-      #f5f5fe 100%
-    );
-}
 
 .hero-art {
   position: relative;
+  overflow: hidden;
 
-  background-image:
-    linear-gradient(
-      90deg,
-      #f7f8ff 0%,
-      rgba(247,248,255,.99) 12%,
-      rgba(247,248,255,.90) 25%,
-      rgba(247,248,255,.65) 38%,
-      rgba(247,248,255,.30) 52%,
-      rgba(247,248,255,0) 70%
-    ),
-    url("assets/hero-team.png");
+  /* fundo do lado direito */
+  background: #f7f8ff;
+}
+
+
+/* IMAGEM */
+.hero-art::before {
+  content: "";
+
+  position: absolute;
+
+  top: 0;
+  bottom: 0;
+
+  /*
+     Aumentamos a largura da imagem para preservar
+     as pessoas das extremidades.
+  */
+  left: -8%;
+  right: -8%;
+
+  background-image: url("assets/hero-team.png");
 
   background-repeat: no-repeat;
 
-  /*
-     IMPORTANTE:
-     100% 100% faz a imagem ocupar exatamente
-     toda a área disponível, sem cortar as pessoas
-     das extremidades.
-  */
-  background-size:
-    100% 100%,
-    100% 100%;
+  background-size: 100% 100%;
 
-  background-position:
-    center,
-    center;
+  background-position: center center;
+
+  z-index: 1;
 }
 
-.eyebrow {
-  font-size: 11px;
 
-  font-weight: 500;
+/* DEGRADÊ SOBRE A IMAGEM */
+.hero-art::after {
+  content: "";
 
-  letter-spacing: .3px;
+  position: absolute;
 
-  margin: 0;
+  inset: 0;
+
+  background:
+    linear-gradient(
+      90deg,
+      #f7f8ff 0%,
+      rgba(247,248,255,.98) 10%,
+      rgba(247,248,255,.88) 20%,
+      rgba(247,248,255,.65) 31%,
+      rgba(247,248,255,.35) 43%,
+      rgba(247,248,255,0) 62%
+    );
+
+  z-index: 2;
+
+  pointer-events: none;
 }
-
-.pill {
-  display: inline-block;
-
-  border: 1px solid #3827e7;
-
-  border-radius: 22px;
-
-  padding: 9px 14px;
-
-  margin-bottom: 20px;
-}
-
-.hero h1 {
-  font-size: 64px;
-
-  line-height: .97;
-
-  letter-spacing: -2.8px;
-
-  margin: 0;
-
-  font-weight: 800;
-}
-
-.hero h1 em {
-  font-style: normal;
-
-  color: #3d31f2;
-}
-
-.accent-line {
-  display: block;
-
-  width: 69px;
-  height: 3px;
-
-  background: #3222e8;
-
-  margin: 26px 0 20px;
-}
-
-.lead {
-  font-size: 16px;
-
-  line-height: 1.62;
-
-  max-width: 370px;
-
-  margin: 0 0 27px;
-}
-
-.hero-buttons {
-  display: flex;
-
-  gap: 18px;
-}
-
-.button {
-  border-radius: 27px;
-
-  padding: 13px 24px;
-
-  font-size: 14px;
-
-  font-weight: 600;
-
-  display: inline-block;
-}
-
-.button span {
-  font-size: 25px;
-
-  line-height: 10px;
-
-  margin-left: 9px;
-}
-
-.button-outline {
-  border: 1.5px solid #3121ea;
-
-  color: #2114db;
-
-  padding: 12px 23px;
-}
-
-.online {
-  margin-top: 28px;
-
-  display: flex;
-
-  gap: 10px;
-
-  align-items: center;
-
-  font-size: 13px;
-}
-
 
 /* =========================================================
    AVATARES
@@ -568,7 +467,7 @@ a {
       90deg,
       #100765 0%,
       #130a79dd 38%,
-      #12056d44 72%,
+      #12056d44 50%,
       transparent
     );
 
