@@ -211,14 +211,36 @@ a {
    HERO
    ========================================================= */
 
-.hero {
-  display: grid;
+.hero-art {
+  position: relative;
 
-  grid-template-columns: 42% 58%;
+  background-image:
+    linear-gradient(
+      90deg,
+      #f7f8ff 0%,
+      #f7f8ff 5%,
+      rgba(247,248,255,.98) 14%,
+      rgba(247,248,255,.90) 25%,
+      rgba(247,248,255,.65) 37%,
+      rgba(247,248,255,.30) 50%,
+      rgba(247,248,255,0) 68%
+    ),
+    url('assets/hero-team.png');
 
-  height: 501px;
+  background-repeat: no-repeat;
 
-  margin-top: -15px;
+  /*
+    O degradê ocupa toda a área.
+    A foto mantém proporção e fica presa
+    ao lado direito.
+  */
+  background-size:
+    100% 100%,
+    cover;
+
+  background-position:
+    center,
+    right center;
 }
 
 .hero-copy {
