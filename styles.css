@@ -211,36 +211,15 @@ a {
    HERO
    ========================================================= */
 
-.hero-art {
-  position: relative;
+.hero {
+  display: grid;
 
-  background-image:
-    linear-gradient(
-      90deg,
-      #f7f8ff 0%,
-      #f7f8ff 5%,
-      rgba(247,248,255,.98) 14%,
-      rgba(247,248,255,.90) 25%,
-      rgba(247,248,255,.65) 37%,
-      rgba(247,248,255,.30) 50%,
-      rgba(247,248,255,0) 68%
-    ),
-    url('assets/hero-team.png');
+  grid-template-columns:
+    42% 58%;
 
-  background-repeat: no-repeat;
+  height: 501px;
 
-  /*
-    O degradê ocupa toda a área.
-    A foto mantém proporção e fica presa
-    ao lado direito.
-  */
-  background-size:
-    100% 100%,
-    cover;
-
-  background-position:
-    center,
-    right center;
+  margin-top: -15px;
 }
 
 .hero-copy {
@@ -252,6 +231,38 @@ a {
       #fff 25%,
       #f5f5fe 100%
     );
+}
+
+.hero-art {
+  position: relative;
+
+  /*
+    A imagem fica presa no lado direito.
+    O degradê suaviza a passagem entre
+    o texto e a fotografia.
+  */
+  background-image:
+    linear-gradient(
+      90deg,
+      #f7f8ff 0%,
+      #f7f8ff 5%,
+      rgba(247, 248, 255, .98) 14%,
+      rgba(247, 248, 255, .90) 25%,
+      rgba(247, 248, 255, .65) 37%,
+      rgba(247, 248, 255, .30) 50%,
+      rgba(247, 248, 255, 0) 68%
+    ),
+    url("assets/hero-team.png");
+
+  background-repeat: no-repeat;
+
+  background-size:
+    100% 100%,
+    cover;
+
+  background-position:
+    center,
+    right center;
 }
 
 .eyebrow {
@@ -434,36 +445,6 @@ a {
 
 
 /* =========================================================
-   IMAGEM DO HERO
-   ========================================================= */
-
-.hero-art {
-  background-image:
-    linear-gradient(
-      90deg,
-      #f7f8ff 0%,
-      rgba(247,248,255,.99) 18%,
-      rgba(247,248,255,.84) 37%,
-      rgba(247,248,255,.42) 59%,
-      transparent 79%
-    ),
-    url("assets/hero-team.png");
-
-  background-repeat: no-repeat;
-
-  background-size:
-    100% 100%,
-    cover;
-
-  background-position:
-    center,
-    center;
-
-  position: relative;
-}
-
-
-/* =========================================================
    CATEGORIAS
    ========================================================= */
 
@@ -478,9 +459,13 @@ a {
     34px
     3.7%;
 
-  border-radius: 0 0 18px 18px;
+  border-radius:
+    0 0 18px 18px;
 
-  padding: 20px 20px 26px;
+  padding:
+    20px
+    20px
+    26px;
 }
 
 .category-grid {
@@ -520,7 +505,10 @@ a {
 }
 
 .category-card h3 {
-  margin: 5px 0 7px;
+  margin:
+    5px
+    0
+    7px;
 
   font-size: 14px;
 }
@@ -537,7 +525,7 @@ a {
 
 
 /* =========================================================
-   EVENTOS
+   EVENTO EM DESTAQUE
    ========================================================= */
 
 .event-section {
@@ -583,6 +571,8 @@ a {
       #12056d44 72%,
       transparent
     );
+
+  z-index: 1;
 }
 
 .event-copy {
@@ -590,7 +580,9 @@ a {
 
   position: relative;
 
-  padding: 26px 35px;
+  padding:
+    26px
+    35px;
 }
 
 .event-label {
@@ -600,7 +592,10 @@ a {
 }
 
 .event-copy h3 {
-  margin: 8px 0 13px;
+  margin:
+    8px
+    0
+    13px;
 
   font-size: 26px;
 }
@@ -616,7 +611,10 @@ a {
 
   gap: 22px;
 
-  margin: 0 0 15px;
+  margin:
+    0
+    0
+    15px;
 
   font-size: 12px;
 }
@@ -634,6 +632,8 @@ a {
   background-position: center;
 
   opacity: .88;
+
+  z-index: 0;
 }
 
 .event-empty {
@@ -655,13 +655,16 @@ a {
 
   background: transparent;
 
-  border: 1px solid #9c96ff;
+  border:
+    1px solid #9c96ff;
 
   border-radius: 22px;
 
   color: #fff;
 
-  padding: 9px 18px;
+  padding:
+    9px
+    18px;
 
   font-weight: 600;
 
@@ -689,11 +692,13 @@ a {
 
 
 /* =========================================================
-   ÁREA ADMIN
+   ÁREA ADMINISTRATIVA
    ========================================================= */
 
 .admin-section {
-  padding: 80px 11%;
+  padding:
+    80px
+    11%;
 
   display: grid;
 
@@ -709,7 +714,9 @@ a {
 .community h2 {
   font-size: 43px;
 
-  margin: 13px 0;
+  margin:
+    13px
+    0;
 }
 
 .admin-section h2 em,
@@ -724,7 +731,8 @@ a {
 .admin-panel {
   background: #f9faff;
 
-  border: 1px solid #e2e4f0;
+  border:
+    1px solid #e2e4f0;
 
   border-radius: 13px;
 
@@ -814,7 +822,7 @@ textarea {
 
 
 /* =========================================================
-   LISTAS
+   LISTAS DE EVENTOS
    ========================================================= */
 
 .event-list {
@@ -863,28 +871,6 @@ textarea {
   color: #c22;
 }
 
-.locked {
-  text-align: center;
-
-  padding: 45px 20px;
-}
-
-.locked h3 {
-  font-size: 22px;
-
-  margin: 0 0 9px;
-}
-
-.locked p {
-  max-width: 360px;
-
-  margin: 0 auto 22px;
-
-  line-height: 1.5;
-
-  color: #575d7b;
-}
-
 .empty-note {
   font-size: 13px;
 
@@ -895,7 +881,42 @@ textarea {
 
 
 /* =========================================================
-   PERFIL / MEMBRO
+   ACESSO BLOQUEADO
+   ========================================================= */
+
+.locked {
+  text-align: center;
+
+  padding:
+    45px
+    20px;
+}
+
+.locked h3 {
+  font-size: 22px;
+
+  margin:
+    0
+    0
+    9px;
+}
+
+.locked p {
+  max-width: 360px;
+
+  margin:
+    0
+    auto
+    22px;
+
+  line-height: 1.5;
+
+  color: #575d7b;
+}
+
+
+/* =========================================================
+   PERFIL DO MEMBRO
    ========================================================= */
 
 .member-top {
@@ -962,12 +983,15 @@ textarea {
 .manager-list h3 {
   font-size: 15px;
 
-  margin: 0 0 12px;
+  margin:
+    0
+    0
+    12px;
 }
 
 
 /* =========================================================
-   ABAS ADMIN
+   ABAS ADMINISTRATIVAS
    ========================================================= */
 
 .manager-tabs {
@@ -982,7 +1006,10 @@ textarea {
 }
 
 .manager-tab {
-  padding: 0 0 10px;
+  padding:
+    0
+    0
+    10px;
 
   border: 0;
 
@@ -1015,7 +1042,7 @@ textarea {
 
 
 /* =========================================================
-   MODAL LOGIN
+   MODAL DE LOGIN / CADASTRO
    ========================================================= */
 
 .modal {
@@ -1041,7 +1068,8 @@ textarea {
 .modal-card {
   position: relative;
 
-  width: min(440px, 100%);
+  width:
+    min(440px, 100%);
 
   background: #fff;
 
@@ -1050,7 +1078,10 @@ textarea {
   padding: 29px;
 
   box-shadow:
-    0 20px 55px #02063855;
+    0
+    20px
+    55px
+    #02063855;
 }
 
 .modal-close {
@@ -1087,7 +1118,10 @@ textarea {
 
   background: none;
 
-  padding: 0 2px 10px;
+  padding:
+    0
+    2px
+    10px;
 
   color: #6a6e86;
 
@@ -1108,7 +1142,10 @@ textarea {
 .auth-form h2 {
   font-size: 29px;
 
-  margin: 0 0 6px;
+  margin:
+    0
+    0
+    6px;
 }
 
 .auth-form > p {
@@ -1116,7 +1153,10 @@ textarea {
 
   color: #656a82;
 
-  margin: 0 0 20px;
+  margin:
+    0
+    0
+    20px;
 }
 
 .auth-form .button {
@@ -1161,7 +1201,9 @@ textarea {
 
   color: #fff;
 
-  padding: 13px 18px;
+  padding:
+    13px
+    18px;
 
   border-radius: 7px;
 
@@ -1170,7 +1212,10 @@ textarea {
   font-size: 13px;
 
   box-shadow:
-    0 8px 25px #07115e44;
+    0
+    8px
+    25px
+    #07115e44;
 
   opacity: 0;
 
@@ -1193,12 +1238,6 @@ textarea {
 /* =========================================================
    CONECT IA
    ========================================================= */
-
-/*
-   IMPORTANTE:
-   NÃO existe display:block!important aqui.
-   O JavaScript controla a abertura usando .open.
-*/
 
 .chat-toggle {
   position: fixed;
@@ -1236,7 +1275,9 @@ textarea {
 }
 
 
-/* CHAT FECHADO */
+/* =========================================================
+   CHAT FECHADO
+   ========================================================= */
 
 .chat-box {
   display: none;
@@ -1257,20 +1298,23 @@ textarea {
   background: #fff;
 
   border-radius:
-    0 0 17px 17px;
+    0
+    0
+    17px
+    17px;
 
   z-index: 101;
 
   box-shadow:
-    0 5px 18px #07115e1a;
+    0
+    5px
+    18px
+    #07115e1a;
 
   overflow-x: hidden;
 
   overflow-y: auto;
 }
-
-
-/* CHAT ABERTO */
 
 .chat-box.open {
   display: block;
@@ -1278,7 +1322,7 @@ textarea {
 
 
 /* =========================================================
-   CABEÇALHO DA IA
+   CABEÇALHO DA CONECT IA
    ========================================================= */
 
 .chat-header {
@@ -1319,12 +1363,14 @@ textarea {
 
   border-radius: 4px;
 
-  padding: 2px 4px;
+  padding:
+    2px
+    4px;
 }
 
 
 /* =========================================================
-   BOTÃO X DA IA
+   BOTÃO FECHAR CHAT
    ========================================================= */
 
 #close-chat {
@@ -1361,7 +1407,7 @@ textarea {
 
 
 /* =========================================================
-   AÇÕES RÁPIDAS DA IA
+   AÇÕES RÁPIDAS
    ========================================================= */
 
 .quick-actions {
@@ -1390,12 +1436,17 @@ textarea {
 
   border-radius: 7px;
 
-  padding: 9px 8px;
+  padding:
+    9px
+    8px;
 
   margin-bottom: 6px;
 
   box-shadow:
-    0 2px 7px #080e5314;
+    0
+    2px
+    7px
+    #080e5314;
 
   color: #2d1fe9;
 
@@ -1490,7 +1541,9 @@ textarea {
    ========================================================= */
 
 footer {
-  padding: 40px 8%;
+  padding:
+    40px
+    8%;
 
   background: #07115e;
 
@@ -1541,7 +1594,6 @@ footer small {
 
     width: 220px;
   }
-
 }
 
 
@@ -1558,7 +1610,9 @@ footer small {
 
     border-radius: 0;
 
-    padding: 0 16px;
+    padding:
+      0
+      16px;
   }
 
   .brand {
@@ -1601,7 +1655,10 @@ footer small {
     gap: 0;
 
     box-shadow:
-      0 8px 20px #07115e18;
+      0
+      8px
+      20px
+      #07115e18;
   }
 
   .topbar nav.open {
@@ -1635,7 +1692,9 @@ footer small {
   }
 
   .hero-copy {
-    padding: 48px 8%;
+    padding:
+      48px
+      8%;
   }
 
   .hero h1 {
@@ -1644,6 +1703,10 @@ footer small {
 
   .hero-art {
     height: 310px;
+
+    background-position:
+      center,
+      center;
   }
 
   .categories,
@@ -1681,19 +1744,25 @@ footer small {
   .event-meta {
     flex-wrap: wrap;
 
-    gap: 8px 15px;
+    gap:
+      8px
+      15px;
   }
 
   .admin-section {
     grid-template-columns: 1fr;
 
-    padding: 60px 7%;
+    padding:
+      60px
+      7%;
 
     gap: 30px;
   }
 
   .community {
-    padding: 65px 20px;
+    padding:
+      65px
+      20px;
   }
 
   footer {
@@ -1752,7 +1821,6 @@ footer small {
 
     border-radius: 14px;
   }
-
 }
 
 
@@ -1789,5 +1857,4 @@ footer small {
 
     bottom: 70px;
   }
-
 }
