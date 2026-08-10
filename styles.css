@@ -208,68 +208,40 @@ a {
 
 
 /* =========================================================
-   HERO — IMAGEM COMPLETA
+   IMAGEM DO HERO — AJUSTE FINAL
    ========================================================= */
 
 .hero-art {
   position: relative;
+
   overflow: hidden;
 
-  /* fundo do lado direito */
-  background: #f7f8ff;
-}
-
-
-/* IMAGEM */
-.hero-art::before {
-  content: "";
-
-  position: absolute;
-
-  top: 0;
-  bottom: 0;
-
-  /*
-     Aumentamos a largura da imagem para preservar
-     as pessoas das extremidades.
-  */
-  left: -8%;
-  right: -8%;
-
-  background-image: url("assets/hero-team.png");
-
-  background-repeat: no-repeat;
-
-  background-size: 100% 100%;
-
-  background-position: center center;
-
-  z-index: 1;
-}
-
-
-/* DEGRADÊ SOBRE A IMAGEM */
-.hero-art::after {
-  content: "";
-
-  position: absolute;
-
-  inset: 0;
-
-  background:
+  background-image:
     linear-gradient(
       90deg,
       #f7f8ff 0%,
-      rgba(247,248,255,.98) 10%,
-      rgba(247,248,255,.88) 20%,
-      rgba(247,248,255,.65) 31%,
-      rgba(247,248,255,.35) 43%,
-      rgba(247,248,255,0) 62%
-    );
+      rgba(247,248,255,.99) 13%,
+      rgba(247,248,255,.90) 25%,
+      rgba(247,248,255,.65) 39%,
+      rgba(247,248,255,.30) 53%,
+      rgba(247,248,255,0) 72%
+    ),
+    url("assets/hero-team.png");
 
-  z-index: 2;
+  background-repeat: no-repeat;
 
-  pointer-events: none;
+  /*
+   * IMPORTANTE:
+   * contain evita que as pessoas das extremidades
+   * sejam cortadas.
+   */
+  background-size:
+    100% 100%,
+    100% auto;
+
+  background-position:
+    center,
+    right center;
 }
 
 /* =========================================================
