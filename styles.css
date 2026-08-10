@@ -208,41 +208,137 @@ a {
 
 
 /* =========================================================
-   IMAGEM DO HERO — AJUSTE FINAL
+   HERO
    ========================================================= */
 
-.hero-art {
-  position: relative;
+.hero {
+  display: grid;
 
-  overflow: hidden;
+  grid-template-columns: 42% 58%;
 
-  background-image:
-    linear-gradient(
-      90deg,
-      #f7f8ff 0%,
-      rgba(247,248,255,.99) 13%,
-      rgba(247,248,255,.90) 25%,
-      rgba(247,248,255,.65) 39%,
-      rgba(247,248,255,.30) 53%,
-      rgba(247,248,255,0) 72%
-    ),
-    url("assets/hero-team.png");
+  height: 501px;
 
-  background-repeat: no-repeat;
-
-  /*
-   * IMPORTANTE:
-   * contain evita que as pessoas das extremidades
-   * sejam cortadas.
-   */
-  background-size:
-    100% 100%,
-    100% auto;
-
-  background-position:
-    center,
-    right center;
+  margin-top: -15px;
 }
+
+.hero-copy {
+  padding: 38px 20px 0 5.05vw;
+
+  background:
+    linear-gradient(
+      112deg,
+      #fff 25%,
+      #f5f5fe 100%
+    );
+}
+
+.eyebrow {
+  font-size: 11px;
+
+  font-weight: 500;
+
+  letter-spacing: .3px;
+
+  margin: 0;
+}
+
+.pill {
+  display: inline-block;
+
+  border: 1px solid #3827e7;
+
+  border-radius: 22px;
+
+  padding: 9px 14px;
+
+  margin-bottom: 20px;
+}
+
+.hero h1 {
+  font-size: 64px;
+
+  line-height: .97;
+
+  letter-spacing: -2.8px;
+
+  margin: 0;
+
+  font-weight: 800;
+}
+
+.hero h1 em {
+  font-style: normal;
+
+  color: #3d31f2;
+}
+
+.accent-line {
+  display: block;
+
+  width: 69px;
+  height: 3px;
+
+  background: #3222e8;
+
+  margin: 26px 0 20px;
+}
+
+.lead {
+  font-size: 16px;
+
+  line-height: 1.62;
+
+  max-width: 370px;
+
+  margin: 0 0 27px;
+}
+
+.hero-buttons {
+  display: flex;
+
+  gap: 18px;
+}
+
+.button {
+  border-radius: 27px;
+
+  padding: 13px 24px;
+
+  font-size: 14px;
+
+  font-weight: 600;
+
+  display: inline-block;
+}
+
+.button span {
+  font-size: 25px;
+
+  line-height: 10px;
+
+  margin-left: 9px;
+}
+
+.button-outline {
+  border: 1.5px solid #3121ea;
+
+  color: #2114db;
+
+  padding: 12px 23px;
+}
+
+.online {
+  margin-top: 28px;
+
+  display: flex;
+
+  gap: 10px;
+
+  align-items: center;
+
+  font-size: 13px;
+}
+
 
 /* =========================================================
    AVATARES
@@ -316,6 +412,58 @@ a {
 
 
 /* =========================================================
+   IMAGEM DO HERO
+   ========================================================= */
+
+/*
+   IMPORTANTE:
+   Existe apenas UM .hero-art.
+
+   A imagem usa 100% da largura disponível.
+   Isso evita o "cover" aumentar a foto e cortar
+   a pessoa da ponta direita.
+*/
+
+.hero-art {
+  position: relative;
+
+  overflow: hidden;
+
+  background-image:
+    linear-gradient(
+      90deg,
+      #f7f8ff 0%,
+      rgba(247,248,255,.99) 12%,
+      rgba(247,248,255,.92) 24%,
+      rgba(247,248,255,.72) 37%,
+      rgba(247,248,255,.43) 51%,
+      rgba(247,248,255,.17) 63%,
+      rgba(247,248,255,0) 76%
+    ),
+    url("assets/hero-team.png");
+
+  background-repeat:
+    no-repeat,
+    no-repeat;
+
+  /*
+     Primeira camada = degradê.
+     Segunda camada = imagem.
+
+     100% auto faz a imagem ocupar toda a largura
+     sem usar "cover", evitando cortes nas laterais.
+  */
+  background-size:
+    100% 100%,
+    100% auto;
+
+  background-position:
+    center,
+    right center;
+}
+
+
+/* =========================================================
    CATEGORIAS
    ========================================================= */
 
@@ -330,13 +478,9 @@ a {
     34px
     3.7%;
 
-  border-radius:
-    0 0 18px 18px;
+  border-radius: 0 0 18px 18px;
 
-  padding:
-    20px
-    20px
-    26px;
+  padding: 20px 20px 26px;
 }
 
 .category-grid {
@@ -376,10 +520,7 @@ a {
 }
 
 .category-card h3 {
-  margin:
-    5px
-    0
-    7px;
+  margin: 5px 0 7px;
 
   font-size: 14px;
 }
@@ -396,7 +537,7 @@ a {
 
 
 /* =========================================================
-   EVENTO EM DESTAQUE
+   EVENTOS
    ========================================================= */
 
 .event-section {
@@ -439,11 +580,9 @@ a {
       90deg,
       #100765 0%,
       #130a79dd 38%,
-      #12056d44 50%,
+      #12056d44 72%,
       transparent
     );
-
-  z-index: 1;
 }
 
 .event-copy {
@@ -451,9 +590,7 @@ a {
 
   position: relative;
 
-  padding:
-    26px
-    35px;
+  padding: 26px 35px;
 }
 
 .event-label {
@@ -463,10 +600,7 @@ a {
 }
 
 .event-copy h3 {
-  margin:
-    8px
-    0
-    13px;
+  margin: 8px 0 13px;
 
   font-size: 26px;
 }
@@ -482,10 +616,7 @@ a {
 
   gap: 22px;
 
-  margin:
-    0
-    0
-    15px;
+  margin: 0 0 15px;
 
   font-size: 12px;
 }
@@ -498,13 +629,13 @@ a {
   background-image:
     url("assets/event-stage.png");
 
+  background-repeat: no-repeat;
+
   background-size: cover;
 
   background-position: center;
 
   opacity: .88;
-
-  z-index: 0;
 }
 
 .event-empty {
@@ -526,16 +657,13 @@ a {
 
   background: transparent;
 
-  border:
-    1px solid #9c96ff;
+  border: 1px solid #9c96ff;
 
   border-radius: 22px;
 
   color: #fff;
 
-  padding:
-    9px
-    18px;
+  padding: 9px 18px;
 
   font-weight: 600;
 
@@ -563,13 +691,11 @@ a {
 
 
 /* =========================================================
-   ÁREA ADMINISTRATIVA
+   ÁREA ADMIN
    ========================================================= */
 
 .admin-section {
-  padding:
-    80px
-    11%;
+  padding: 80px 11%;
 
   display: grid;
 
@@ -585,9 +711,7 @@ a {
 .community h2 {
   font-size: 43px;
 
-  margin:
-    13px
-    0;
+  margin: 13px 0;
 }
 
 .admin-section h2 em,
@@ -602,8 +726,7 @@ a {
 .admin-panel {
   background: #f9faff;
 
-  border:
-    1px solid #e2e4f0;
+  border: 1px solid #e2e4f0;
 
   border-radius: 13px;
 
@@ -693,7 +816,7 @@ textarea {
 
 
 /* =========================================================
-   LISTAS DE EVENTOS
+   LISTAS
    ========================================================= */
 
 .event-list {
@@ -742,6 +865,28 @@ textarea {
   color: #c22;
 }
 
+.locked {
+  text-align: center;
+
+  padding: 45px 20px;
+}
+
+.locked h3 {
+  font-size: 22px;
+
+  margin: 0 0 9px;
+}
+
+.locked p {
+  max-width: 360px;
+
+  margin: 0 auto 22px;
+
+  line-height: 1.5;
+
+  color: #575d7b;
+}
+
 .empty-note {
   font-size: 13px;
 
@@ -752,42 +897,7 @@ textarea {
 
 
 /* =========================================================
-   ACESSO BLOQUEADO
-   ========================================================= */
-
-.locked {
-  text-align: center;
-
-  padding:
-    45px
-    20px;
-}
-
-.locked h3 {
-  font-size: 22px;
-
-  margin:
-    0
-    0
-    9px;
-}
-
-.locked p {
-  max-width: 360px;
-
-  margin:
-    0
-    auto
-    22px;
-
-  line-height: 1.5;
-
-  color: #575d7b;
-}
-
-
-/* =========================================================
-   PERFIL DO MEMBRO
+   PERFIL / MEMBRO
    ========================================================= */
 
 .member-top {
@@ -854,15 +964,12 @@ textarea {
 .manager-list h3 {
   font-size: 15px;
 
-  margin:
-    0
-    0
-    12px;
+  margin: 0 0 12px;
 }
 
 
 /* =========================================================
-   ABAS ADMINISTRATIVAS
+   ABAS ADMIN
    ========================================================= */
 
 .manager-tabs {
@@ -877,10 +984,7 @@ textarea {
 }
 
 .manager-tab {
-  padding:
-    0
-    0
-    10px;
+  padding: 0 0 10px;
 
   border: 0;
 
@@ -913,7 +1017,7 @@ textarea {
 
 
 /* =========================================================
-   MODAL DE LOGIN / CADASTRO
+   MODAL LOGIN
    ========================================================= */
 
 .modal {
@@ -939,8 +1043,7 @@ textarea {
 .modal-card {
   position: relative;
 
-  width:
-    min(440px, 100%);
+  width: min(440px, 100%);
 
   background: #fff;
 
@@ -949,10 +1052,7 @@ textarea {
   padding: 29px;
 
   box-shadow:
-    0
-    20px
-    55px
-    #02063855;
+    0 20px 55px #02063855;
 }
 
 .modal-close {
@@ -989,10 +1089,7 @@ textarea {
 
   background: none;
 
-  padding:
-    0
-    2px
-    10px;
+  padding: 0 2px 10px;
 
   color: #6a6e86;
 
@@ -1013,10 +1110,7 @@ textarea {
 .auth-form h2 {
   font-size: 29px;
 
-  margin:
-    0
-    0
-    6px;
+  margin: 0 0 6px;
 }
 
 .auth-form > p {
@@ -1024,10 +1118,7 @@ textarea {
 
   color: #656a82;
 
-  margin:
-    0
-    0
-    20px;
+  margin: 0 0 20px;
 }
 
 .auth-form .button {
@@ -1072,9 +1163,7 @@ textarea {
 
   color: #fff;
 
-  padding:
-    13px
-    18px;
+  padding: 13px 18px;
 
   border-radius: 7px;
 
@@ -1083,10 +1172,7 @@ textarea {
   font-size: 13px;
 
   box-shadow:
-    0
-    8px
-    25px
-    #07115e44;
+    0 8px 25px #07115e44;
 
   opacity: 0;
 
@@ -1169,23 +1255,22 @@ textarea {
   background: #fff;
 
   border-radius:
-    0
-    0
-    17px
-    17px;
+    0 0 17px 17px;
 
   z-index: 101;
 
   box-shadow:
-    0
-    5px
-    18px
-    #07115e1a;
+    0 5px 18px #07115e1a;
 
   overflow-x: hidden;
 
   overflow-y: auto;
 }
+
+
+/* =========================================================
+   CHAT ABERTO
+   ========================================================= */
 
 .chat-box.open {
   display: block;
@@ -1193,7 +1278,7 @@ textarea {
 
 
 /* =========================================================
-   CABEÇALHO DA CONECT IA
+   CABEÇALHO DA IA
    ========================================================= */
 
 .chat-header {
@@ -1234,14 +1319,12 @@ textarea {
 
   border-radius: 4px;
 
-  padding:
-    2px
-    4px;
+  padding: 2px 4px;
 }
 
 
 /* =========================================================
-   BOTÃO FECHAR CHAT
+   BOTÃO X
    ========================================================= */
 
 #close-chat {
@@ -1307,17 +1390,12 @@ textarea {
 
   border-radius: 7px;
 
-  padding:
-    9px
-    8px;
+  padding: 9px 8px;
 
   margin-bottom: 6px;
 
   box-shadow:
-    0
-    2px
-    7px
-    #080e5314;
+    0 2px 7px #080e5314;
 
   color: #2d1fe9;
 
@@ -1412,9 +1490,7 @@ textarea {
    ========================================================= */
 
 footer {
-  padding:
-    40px
-    8%;
+  padding: 40px 8%;
 
   background: #07115e;
 
@@ -1465,6 +1541,19 @@ footer small {
 
     width: 220px;
   }
+
+  /*
+     No tablet mantemos a imagem inteira.
+  */
+  .hero-art {
+    background-size:
+      100% 100%,
+      100% auto;
+
+    background-position:
+      center,
+      right center;
+  }
 }
 
 
@@ -1481,9 +1570,7 @@ footer small {
 
     border-radius: 0;
 
-    padding:
-      0
-      16px;
+    padding: 0 16px;
   }
 
   .brand {
@@ -1526,10 +1613,7 @@ footer small {
     gap: 0;
 
     box-shadow:
-      0
-      8px
-      20px
-      #07115e18;
+      0 8px 20px #07115e18;
   }
 
   .topbar nav.open {
@@ -1556,6 +1640,11 @@ footer small {
     padding: 10px;
   }
 
+
+  /* =======================================================
+     HERO MOBILE
+     ======================================================= */
+
   .hero {
     height: auto;
 
@@ -1563,9 +1652,7 @@ footer small {
   }
 
   .hero-copy {
-    padding:
-      48px
-      8%;
+    padding: 48px 8%;
   }
 
   .hero h1 {
@@ -1575,10 +1662,22 @@ footer small {
   .hero-art {
     height: 310px;
 
+    /*
+       Mantém a imagem inteira também no celular.
+    */
+    background-size:
+      100% 100%,
+      auto 100%;
+
     background-position:
       center,
-      center;
+      right center;
   }
+
+
+  /* =======================================================
+     CATEGORIAS MOBILE
+     ======================================================= */
 
   .categories,
   .event-section {
@@ -1600,6 +1699,11 @@ footer small {
     min-height: 108px;
   }
 
+
+  /* =======================================================
+     EVENTO MOBILE
+     ======================================================= */
+
   .event-section {
     margin-bottom: 30px;
   }
@@ -1615,25 +1719,24 @@ footer small {
   .event-meta {
     flex-wrap: wrap;
 
-    gap:
-      8px
-      15px;
+    gap: 8px 15px;
   }
+
+
+  /* =======================================================
+     ADMIN MOBILE
+     ======================================================= */
 
   .admin-section {
     grid-template-columns: 1fr;
 
-    padding:
-      60px
-      7%;
+    padding: 60px 7%;
 
     gap: 30px;
   }
 
   .community {
-    padding:
-      65px
-      20px;
+    padding: 65px 20px;
   }
 
   footer {
@@ -1668,7 +1771,7 @@ footer small {
 
 
   /* =======================================================
-     CHAT NO CELULAR
+     CHAT MOBILE
      ======================================================= */
 
   .chat-toggle {
@@ -1727,5 +1830,21 @@ footer small {
     right: 14px;
 
     bottom: 70px;
+  }
+
+  /*
+     No celular pequeno usamos a altura da área
+     para preservar as pessoas da imagem.
+  */
+  .hero-art {
+    height: 310px;
+
+    background-size:
+      100% 100%,
+      auto 100%;
+
+    background-position:
+      center,
+      right center;
   }
 }
