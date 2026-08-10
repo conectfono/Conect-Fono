@@ -415,53 +415,32 @@ a {
    IMAGEM DO HERO
    ========================================================= */
 
-/*
-   IMPORTANTE:
-   Existe apenas UM .hero-art.
-
-   A imagem usa 100% da largura disponível.
-   Isso evita o "cover" aumentar a foto e cortar
-   a pessoa da ponta direita.
-*/
-
 .hero-art {
   position: relative;
-
-  overflow: hidden;
 
   background-image:
     linear-gradient(
       90deg,
       #f7f8ff 0%,
-      rgba(247,248,255,.99) 12%,
-      rgba(247,248,255,.92) 24%,
-      rgba(247,248,255,.72) 37%,
-      rgba(247,248,255,.43) 51%,
-      rgba(247,248,255,.17) 63%,
-      rgba(247,248,255,0) 76%
+      #f7f8ff 6%,
+      rgba(247,248,255,.98) 13%,
+      rgba(247,248,255,.78) 21%,
+      rgba(247,248,255,.38) 30%,
+      rgba(247,248,255,.12) 38%,
+      rgba(247,248,255,0) 48%
     ),
     url("assets/hero-team.png");
 
-  background-repeat:
-    no-repeat,
-    no-repeat;
+  background-repeat: no-repeat;
 
-  /*
-     Primeira camada = degradê.
-     Segunda camada = imagem.
-
-     100% auto faz a imagem ocupar toda a largura
-     sem usar "cover", evitando cortes nas laterais.
-  */
   background-size:
     100% 100%,
-    100% auto;
+    cover;
 
   background-position:
     center,
     right center;
 }
-
 
 /* =========================================================
    CATEGORIAS
