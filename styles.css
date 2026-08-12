@@ -536,7 +536,7 @@ a {
 .featured-event {
   height: 226px;
 
-  border-radius: 16px;
+  border-radius: 20px;
 
   background: #0d0a60;
 
@@ -558,9 +558,9 @@ a {
     linear-gradient(
       90deg,
       rgba(16, 7, 101, 0.96) 0%,
-      rgba(19, 10, 121, 0.72) 28%,
-      rgba(18, 5, 109, 0.30) 55%,
-      rgba(18, 5, 109, 0.05) 75%,
+      rgba(19, 10, 121, 0.72) 0%,
+      rgba(18, 5, 109, 0.30) 0%,
+      rgba(18, 5, 109, 0.05) 0%,
       transparent 100%
     );
 
