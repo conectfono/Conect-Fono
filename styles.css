@@ -36,7 +36,7 @@ a {
 
 .topbar {
   position: relative;
-  z-index: 10;
+  : 10;
 
   margin: 15px 3.35%;
   height: 90px;
@@ -557,11 +557,16 @@ a {
   background:
     linear-gradient(
       90deg,
-      #100765 0%,
-      #130a79dd 0%,
-      #12056d44 72%,
-      transparent
+      rgba(16, 7, 101, 0.96) 0%,
+      rgba(19, 10, 121, 0.72) 28%,
+      rgba(18, 5, 109, 0.30) 55%,
+      rgba(18, 5, 109, 0.05) 75%,
+      transparent 100%
     );
+
+  z-index: 1;
+
+  pointer-events: none;
 }
 
 .event-copy {
@@ -605,8 +610,7 @@ a {
 
   inset: 0;
 
-  background-image:
-    url("assets/event-stage.png");
+  background-image: url("assets/event-stage.png");
 
   background-repeat: no-repeat;
 
@@ -614,13 +618,17 @@ a {
 
   background-position: center;
 
-  opacity: .88;
+  opacity: 1;
+
+  z-index: 0;
+
+  filter: none;
 }
 
 .event-empty {
   position: relative;
 
-  z-index: 3;
+  : 3;
 
   display: grid;
 
@@ -1004,7 +1012,7 @@ textarea {
 
   inset: 0;
 
-  z-index: 200;
+  : 200;
 
   background: #07115e77;
 
@@ -1136,7 +1144,7 @@ textarea {
 
   bottom: 76px;
 
-  z-index: 300;
+  : 300;
 
   background: #07115e;
 
@@ -1203,7 +1211,7 @@ textarea {
 
   cursor: pointer;
 
-  z-index: 100;
+  : 100;
 }
 
 .chat-toggle span {
@@ -1236,7 +1244,7 @@ textarea {
   border-radius:
     0 0 17px 17px;
 
-  z-index: 101;
+  : 101;
 
   box-shadow:
     0 5px 18px #07115e1a;
@@ -1331,7 +1339,7 @@ textarea {
 
   padding: 0;
 
-  z-index: 5;
+  : 5;
 }
 
 #close-chat:hover {
