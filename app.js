@@ -5,15 +5,18 @@ const DB = {
   session: 'connect-fono-session-v1'
 };
 
-const defaults = [{
-  id: 'fono-experience',
-  title: 'Fono Experience 2026',
-  date: '2026-10-18',
-  place: 'Natal, RN',
-  description: 'Um dia inteiro de conhecimento, troca e experiências reais.',
-  status: 'scheduled',
-  featured: true
-}];
+const defaults = [
+  {
+    id: 'fono-experience',
+    title: 'Fono Experience 2026',
+    date: '2026-10-18',
+    place: 'Natal, RN',
+    description:
+      'Um dia inteiro de conhecimento, troca e experiências reais.',
+    status: 'scheduled',
+    featured: true
+  }
+];
 
 const seedAdmin = {
   id: 'admin-connect',
@@ -31,7 +34,12 @@ const uid = () => {
     return crypto.randomUUID();
   }
 
-  return 'id-' + Date.now() + '-' + Math.random().toString(16).slice(2);
+  return (
+    'id-' +
+    Date.now() +
+    '-' +
+    Math.random().toString(16).slice(2)
+  );
 };
 
 const get = (key, fallback = []) => {
@@ -56,7 +64,7 @@ let session = get(DB.session, null);
 
 /* =========================================================
    FUNÇÕES GERAIS
-   ========================================================= */
+========================================================= */
 
 function persist() {
   put(DB.events, events);
@@ -94,7 +102,9 @@ const upcoming = () =>
 
 const eventInFocus = () =>
   events.find(
-    e => e.featured && e.status === 'scheduled'
+    e =>
+      e.featured &&
+      e.status === 'scheduled'
   ) || upcoming()[0];
 
 function toast(text) {
@@ -113,17 +123,15 @@ function toast(text) {
 
 /* =========================================================
    MENU MOBILE
-   ========================================================= */
+========================================================= */
 
 function initMobileMenu() {
-
   const menuToggle = $('.menu-toggle');
   const nav = $('#main-nav');
 
   if (!menuToggle || !nav) return;
 
   menuToggle.addEventListener('click', event => {
-
     event.preventDefault();
     event.stopPropagation();
 
@@ -131,13 +139,13 @@ function initMobileMenu() {
 
     menuToggle.setAttribute(
       'aria-expanded',
-      nav.classList.contains('open') ? 'true' : 'false'
+      nav.classList.contains('open')
+        ? 'true'
+        : 'false'
     );
-
   });
 
   nav.querySelectorAll('a').forEach(link => {
-
     link.addEventListener('click', () => {
       nav.classList.remove('open');
 
@@ -146,18 +154,15 @@ function initMobileMenu() {
         'false'
       );
     });
-
   });
-
 }
 
 
 /* =========================================================
    CONECT IA
-   ========================================================= */
+========================================================= */
 
 function openChat() {
-
   const box = $('#chat-box');
 
   if (!box) return;
@@ -168,12 +173,9 @@ function openChat() {
     'aria-hidden',
     'false'
   );
-
 }
 
-
 function closeChat() {
-
   const box = $('#chat-box');
 
   if (!box) return;
@@ -184,25 +186,18 @@ function closeChat() {
     'aria-hidden',
     'true'
   );
-
 }
 
-
 function initChat() {
-
   const chatToggle = $('#chat-toggle');
   const closeButton = $('#close-chat');
   const chatBox = $('#chat-box');
   const chatForm = $('#chat-form');
 
-  /*
-   * ABRIR
-   */
+  /* ABRIR */
 
   if (chatToggle) {
-
     chatToggle.addEventListener('click', event => {
-
       event.preventDefault();
       event.stopPropagation();
 
@@ -210,61 +205,36 @@ function initChat() {
         chatBox &&
         chatBox.classList.contains('open')
       ) {
-
         closeChat();
-
       } else {
-
         openChat();
-
       }
-
     });
-
   }
 
-
-  /*
-   * FECHAR PELO X
-   */
+  /* FECHAR PELO X */
 
   if (closeButton) {
-
     closeButton.addEventListener('click', event => {
-
       event.preventDefault();
       event.stopPropagation();
 
       closeChat();
-
     });
-
   }
 
-
-  /*
-   * NÃO FECHAR AO CLICAR DENTRO DA JANELA
-   */
+  /* NÃO FECHAR AO CLICAR DENTRO DA JANELA */
 
   if (chatBox) {
-
     chatBox.addEventListener('click', event => {
-
       event.stopPropagation();
-
     });
-
   }
 
-
-  /*
-   * FORMULÁRIO DO CHAT
-   */
+  /* FORMULÁRIO DO CHAT */
 
   if (chatForm) {
-
     chatForm.addEventListener('submit', event => {
-
       event.preventDefault();
 
       const input = $('#chat-input');
@@ -280,128 +250,124 @@ function initChat() {
       );
 
       input.value = '';
-
     });
-
   }
 
-
-  /*
-   * BOTÕES DE AÇÃO RÁPIDA
-   */
+  /* BOTÕES DE AÇÃO RÁPIDA */
 
   document
     .querySelectorAll('.quick-actions button')
     .forEach(button => {
-
       button.addEventListener('click', () => {
-
         const text =
           button.textContent.toLowerCase();
 
         if (text.includes('eventos')) {
-
           closeChat();
 
           location.hash = 'eventos';
 
         } else if (text.includes('comunidade')) {
-
           closeChat();
 
-          openModal('signup');
+          if (session) {
+            const community =
+              $('#whatsapp-community');
+
+            if (community) {
+              community.scrollIntoView({
+                behavior: 'smooth',
+                block: 'center'
+              });
+            }
+          } else {
+            openModal('signup');
+          }
 
         } else if (text.includes('dúvida')) {
-
           const input = $('#chat-input');
 
           if (input) {
-
             input.focus();
 
             toast(
               'Digite sua dúvida no campo abaixo.'
             );
-
           }
 
         } else if (text.includes('equipe')) {
-
           closeChat();
 
           toast(
             'Em breve você poderá falar diretamente com nossa equipe.'
           );
-
         }
-
       });
-
     });
 
-
-  /*
-   * ESC FECHA A IA
-   */
+  /* ESC FECHA A IA */
 
   document.addEventListener('keydown', event => {
-
     if (event.key === 'Escape') {
-
       closeChat();
-
     }
-
   });
-
 }
 
 
 /* =========================================================
    CABEÇALHO
-   ========================================================= */
+========================================================= */
 
 function renderHeader() {
-
   const b = $('#auth-trigger');
 
   if (!b) return;
 
   if (session) {
-
     b.textContent =
       `Olá, ${session.name.split(' ')[0]} ▾`;
 
     b.onclick = () => {
-
       location.hash = 'admin';
 
       renderAdmin();
-
     };
 
   } else {
-
     b.textContent =
       'Entrar / Cadastrar';
 
     b.onclick = () => {
-
       openModal('login');
-
     };
-
   }
+}
 
+
+/* =========================================================
+   COMUNIDADE WHATSAPP
+========================================================= */
+
+function renderWhatsAppCommunity() {
+  const community =
+    $('#whatsapp-community');
+
+  if (!community) return;
+
+  if (session) {
+    community.style.display = 'flex';
+  } else {
+    community.style.display = 'none';
+  }
 }
 
 
 /* =========================================================
    POPULAÇÃO
-   ========================================================= */
+========================================================= */
 
 function renderPopulation() {
-
   const members = users.filter(
     u =>
       u.role === 'student' ||
@@ -412,14 +378,11 @@ function renderPopulation() {
   const avatars = $('#member-avatars');
 
   if (count) {
-
     count.textContent =
       members.length;
-
   }
 
   if (avatars) {
-
     avatars.innerHTML =
       members
         .slice(0, 5)
@@ -430,25 +393,21 @@ function renderPopulation() {
             )}</b>`
         )
         .join('');
-
   }
-
 }
 
 
 /* =========================================================
    EVENTO EM DESTAQUE
-   ========================================================= */
+========================================================= */
 
 function renderFeatured() {
-
   const e = eventInFocus();
   const holder = $('#featured-event');
 
   if (!holder) return;
 
   if (!e) {
-
     holder.innerHTML = `
       <div class="event-empty">
 
@@ -465,7 +424,6 @@ function renderFeatured() {
     `;
 
     return;
-
   }
 
   const enrolled =
@@ -477,7 +435,6 @@ function renderFeatured() {
     );
 
   holder.innerHTML = `
-
     <div class="event-copy">
 
       <span class="event-label">
@@ -525,34 +482,28 @@ function renderFeatured() {
     </div>
 
     <div class="event-decoration"></div>
-
   `;
-
 }
 
 
 /* =========================================================
    PROTEÇÃO ADMIN
-   ========================================================= */
+========================================================= */
 
 function adminGuard() {
-
   return (
     session &&
     session.role === 'admin'
   );
-
 }
 
 
 /* =========================================================
    FORMULÁRIO DE EVENTO
-   ========================================================= */
+========================================================= */
 
 function eventForm() {
-
   return `
-
     <form id="event-form">
 
       <input
@@ -663,20 +614,16 @@ function eventForm() {
       </div>
 
     </form>
-
   `;
-
 }
 
 
 /* =========================================================
    LISTA DE EVENTOS
-   ========================================================= */
+========================================================= */
 
 function eventList() {
-
   return `
-
     <div class="event-list">
 
       <h3>
@@ -693,7 +640,6 @@ function eventList() {
               )
               .map(
                 e => `
-
                   <div class="event-row">
 
                     <div>
@@ -702,7 +648,11 @@ function eventList() {
 
                         ${escapeHTML(e.title)}
 
-                        ${e.featured ? ' ☆' : ''}
+                        ${
+                          e.featured
+                            ? ' ☆'
+                            : ''
+                        }
 
                       </strong>
 
@@ -714,9 +664,11 @@ function eventList() {
                         ·
 
                         ${
-                          e.status === 'scheduled'
+                          e.status ===
+                          'scheduled'
                             ? 'Programado'
-                            : e.status === 'draft'
+                            : e.status ===
+                              'draft'
                             ? 'Rascunho'
                             : 'Encerrado'
                         }
@@ -743,7 +695,6 @@ function eventList() {
                     </div>
 
                   </div>
-
                 `
               )
               .join('')
@@ -751,20 +702,16 @@ function eventList() {
       }
 
     </div>
-
   `;
-
 }
 
 
 /* =========================================================
    ADMIN
-   ========================================================= */
+========================================================= */
 
 function manager() {
-
   return `
-
     <div class="member-top">
 
       <span class="member-avatar">
@@ -806,7 +753,10 @@ function manager() {
         class="manager-tab"
         data-manager="people"
       >
-        Pessoas (${Math.max(users.length - 1, 0)})
+        Pessoas (${Math.max(
+          users.length - 1,
+          0
+        )})
       </button>
 
       <button
@@ -832,18 +782,15 @@ function manager() {
       </div>
 
     </div>
-
   `;
-
 }
 
 
 /* =========================================================
    PAINEL DO USUÁRIO
-   ========================================================= */
+========================================================= */
 
 function userDashboard() {
-
   const mine =
     enrollments
       .filter(
@@ -860,7 +807,6 @@ function userDashboard() {
       .filter(Boolean);
 
   return `
-
     <div class="member-dashboard">
 
       <div class="member-top">
@@ -878,7 +824,8 @@ function userDashboard() {
           <small>
 
             ${
-              session.role === 'teacher'
+              session.role ===
+              'teacher'
                 ? 'Professor(a)'
                 : 'Estudante'
             }
@@ -909,7 +856,6 @@ function userDashboard() {
           ? mine
               .map(
                 e => `
-
                   <div class="event-row">
 
                     <div>
@@ -933,12 +879,10 @@ function userDashboard() {
                     </button>
 
                   </div>
-
                 `
               )
               .join('')
           : `
-
             <p class="empty-note">
 
               Você ainda não está inscrito
@@ -948,31 +892,25 @@ function userDashboard() {
               em destaque para participar.
 
             </p>
-
           `
       }
 
     </div>
-
   `;
-
 }
 
 
 /* =========================================================
    RENDER ADMIN
-   ========================================================= */
+========================================================= */
 
 function renderAdmin() {
-
   const panel = $('#admin-panel');
 
   if (!panel) return;
 
   if (!session) {
-
     panel.innerHTML = `
-
       <div class="locked">
 
         <h3>
@@ -995,101 +933,90 @@ function renderAdmin() {
         </button>
 
       </div>
-
     `;
 
     const loginButton =
       $('#locked-login');
 
     if (loginButton) {
-
       loginButton.onclick =
         () => openModal('login');
-
     }
 
     return;
-
   }
-
 
   panel.innerHTML =
     adminGuard()
       ? manager()
       : userDashboard();
 
-
   if (adminGuard()) {
-
     bindAdmin();
 
-    panel.onclick = adminClick;
-
+    panel.onclick =
+      adminClick;
   } else {
-
     bindMember();
-
   }
-
 }
 
 
 /* =========================================================
    ADMIN - FUNÇÕES
-   ========================================================= */
+========================================================= */
 
 function bindAdmin() {
-
   const form =
     $('#event-form');
 
   if (form) {
-
     form.onsubmit = ev => {
-
       ev.preventDefault();
 
       const id =
         $('#event-id').value;
 
       const item = {
-
         id:
           id || uid(),
 
         title:
-          $('#title').value.trim(),
+          $('#title')
+            .value
+            .trim(),
 
         date:
-          $('#date').value,
+          $('#date')
+            .value,
 
         place:
-          $('#place').value.trim(),
+          $('#place')
+            .value
+            .trim(),
 
         description:
-          $('#description').value.trim(),
+          $('#description')
+            .value
+            .trim(),
 
         status:
-          $('#status').value,
+          $('#status')
+            .value,
 
         featured:
-          $('#featured').checked
-
+          $('#featured')
+            .checked
       };
 
-
       if (item.featured) {
-
         events.forEach(
           e =>
             e.featured = false
         );
-
       }
 
-
       if (id) {
-
         events =
           events.map(
             e =>
@@ -1097,13 +1024,9 @@ function bindAdmin() {
                 ? item
                 : e
           );
-
       } else {
-
         events.push(item);
-
       }
-
 
       persist();
 
@@ -1113,49 +1036,38 @@ function bindAdmin() {
       toast(
         'Evento salvo com sucesso.'
       );
-
     };
-
   }
-
 
   const logout =
     $('#logout');
 
   if (logout) {
-
     logout.onclick =
       signOut;
-
   }
-
 
   const cancelEdit =
     $('#cancel-edit');
 
   if (cancelEdit) {
-
     cancelEdit.onclick =
       () => renderAdmin();
-
   }
-
 }
 
 
 /* =========================================================
    CLIQUES DO ADMIN
-   ========================================================= */
+========================================================= */
 
 function adminClick(ev) {
-
   const managerButton =
     ev.target.closest(
       '[data-manager]'
     );
 
   if (managerButton) {
-
     ev.preventDefault();
 
     renderManagerSection(
@@ -1163,9 +1075,7 @@ function adminClick(ev) {
     );
 
     return;
-
   }
-
 
   const removeUserButton =
     ev.target.closest(
@@ -1173,9 +1083,9 @@ function adminClick(ev) {
     );
 
   if (removeUserButton) {
-
     const id =
-      removeUserButton.dataset.removeUser;
+      removeUserButton.dataset
+        .removeUser;
 
     if (
       id &&
@@ -1183,10 +1093,10 @@ function adminClick(ev) {
         'Remover este cadastro?'
       )
     ) {
-
       users =
         users.filter(
-          u => u.id !== id
+          u =>
+            u.id !== id
         );
 
       enrollments =
@@ -1206,13 +1116,10 @@ function adminClick(ev) {
       toast(
         'Cadastro removido.'
       );
-
     }
 
     return;
-
   }
-
 
   const removeEnrollmentButton =
     ev.target.closest(
@@ -1220,7 +1127,6 @@ function adminClick(ev) {
     );
 
   if (removeEnrollmentButton) {
-
     const id =
       removeEnrollmentButton.dataset
         .removeEnrollment;
@@ -1231,10 +1137,10 @@ function adminClick(ev) {
         'Cancelar esta inscrição?'
       )
     ) {
-
       enrollments =
         enrollments.filter(
-          x => x.id !== id
+          x =>
+            x.id !== id
         );
 
       persist();
@@ -1246,13 +1152,10 @@ function adminClick(ev) {
       toast(
         'Inscrição cancelada.'
       );
-
     }
 
     return;
-
   }
-
 
   const deleteButton =
     ev.target.closest(
@@ -1260,7 +1163,6 @@ function adminClick(ev) {
     );
 
   if (deleteButton) {
-
     const id =
       deleteButton.dataset.delete;
 
@@ -1270,10 +1172,10 @@ function adminClick(ev) {
         'Excluir este evento?'
       )
     ) {
-
       events =
         events.filter(
-          e => e.id !== id
+          e =>
+            e.id !== id
         );
 
       enrollments =
@@ -1290,13 +1192,10 @@ function adminClick(ev) {
       toast(
         'Evento excluído.'
       );
-
     }
 
     return;
-
   }
-
 
   const editButton =
     ev.target.closest(
@@ -1304,17 +1203,16 @@ function adminClick(ev) {
     );
 
   if (editButton) {
-
     const id =
       editButton.dataset.edit;
 
     const e =
       events.find(
-        x => x.id === id
+        x =>
+          x.id === id
       );
 
     if (!e) return;
-
 
     const eventId =
       $('#event-id');
@@ -1340,68 +1238,65 @@ function adminClick(ev) {
     const cancel =
       $('#cancel-edit');
 
-
     if (eventId)
-      eventId.value = e.id;
+      eventId.value =
+        e.id;
 
     if (title)
-      title.value = e.title;
+      title.value =
+        e.title;
 
     if (date)
-      date.value = e.date;
+      date.value =
+        e.date;
 
     if (place)
-      place.value = e.place;
+      place.value =
+        e.place;
 
     if (description)
       description.value =
         e.description;
 
     if (status)
-      status.value = e.status;
+      status.value =
+        e.status;
 
     if (featured)
       featured.checked =
         e.featured;
 
     if (cancel)
-      cancel.hidden = false;
-
+      cancel.hidden =
+        false;
   }
-
 }
 
 
 /* =========================================================
    ABAS DO ADMIN
-   ========================================================= */
+========================================================= */
 
 function renderManagerSection(tab) {
-
   const content =
     $('#manager-content');
 
   if (!content) return;
-
 
   document
     .querySelectorAll(
       '.manager-tab'
     )
     .forEach(button => {
-
       button.classList.toggle(
         'active',
-        button.dataset.manager === tab
+        button.dataset.manager ===
+          tab
       );
-
     });
 
-
   if (tab === 'events') {
-
     content.innerHTML = `
-
       <div class="event-manager">
 
         <div>
@@ -1411,20 +1306,15 @@ function renderManagerSection(tab) {
         ${eventList()}
 
       </div>
-
     `;
 
     bindAdmin();
 
     return;
-
   }
 
-
   if (tab === 'people') {
-
     content.innerHTML = `
-
       <div class="manager-list">
 
         <h3>
@@ -1439,7 +1329,6 @@ function renderManagerSection(tab) {
             )
             .map(
               u => `
-
                 <div class="event-row">
 
                   <div>
@@ -1453,7 +1342,8 @@ function renderManagerSection(tab) {
                       ${escapeHTML(u.email)}
                       ·
                       ${
-                        u.role === 'teacher'
+                        u.role ===
+                        'teacher'
                           ? 'Professor(a)'
                           : 'Estudante'
                       }
@@ -1470,7 +1360,6 @@ function renderManagerSection(tab) {
                   </button>
 
                 </div>
-
               `
             )
             .join('') ||
@@ -1478,34 +1367,30 @@ function renderManagerSection(tab) {
         }
 
       </div>
-
     `;
 
     return;
-
   }
 
-
   if (tab === 'enrollments') {
-
     const rows =
       enrollments
         .map(en => ({
-
           en,
 
           u:
             users.find(
               u =>
-                u.id === en.userId
+                u.id ===
+                en.userId
             ),
 
           e:
             events.find(
               e =>
-                e.id === en.eventId
+                e.id ===
+                en.eventId
             )
-
         }))
         .filter(
           x =>
@@ -1513,9 +1398,7 @@ function renderManagerSection(tab) {
             x.e
         );
 
-
     content.innerHTML = `
-
       <div class="manager-list">
 
         <h3>
@@ -1526,22 +1409,29 @@ function renderManagerSection(tab) {
           rows
             .map(
               x => `
-
                 <div class="event-row">
 
                   <div>
 
                     <strong>
-                      ${escapeHTML(x.u.name)}
+                      ${escapeHTML(
+                        x.u.name
+                      )}
                     </strong>
 
                     <small>
 
-                      ${escapeHTML(x.e.title)}
+                      ${escapeHTML(
+                        x.e.title
+                      )}
                       ·
-                      ${dateFormat(x.e.date)}
+                      ${dateFormat(
+                        x.e.date
+                      )}
                       ·
-                      ${escapeHTML(x.u.email)}
+                      ${escapeHTML(
+                        x.u.email
+                      )}
 
                     </small>
 
@@ -1555,7 +1445,6 @@ function renderManagerSection(tab) {
                   </button>
 
                 </div>
-
               `
             )
             .join('') ||
@@ -1563,39 +1452,30 @@ function renderManagerSection(tab) {
         }
 
       </div>
-
     `;
-
   }
-
 }
 
 
 /* =========================================================
    ÁREA DO MEMBRO
-   ========================================================= */
+========================================================= */
 
 function bindMember() {
-
   const logout =
     $('#logout');
 
   if (logout) {
-
     logout.onclick =
       signOut;
-
   }
-
 
   const panel =
     $('#admin-panel');
 
   if (!panel) return;
 
-
   panel.onclick = e => {
-
     const button =
       e.target.closest(
         '[data-cancel-enrollment]'
@@ -1603,23 +1483,21 @@ function bindMember() {
 
     if (!button) return;
 
-
     const eventId =
       button.dataset
         .cancelEnrollment;
 
-
     if (eventId) {
-
       enrollments =
         enrollments.filter(
           x =>
             !(
-              x.userId === session.id &&
-              x.eventId === eventId
+              x.userId ===
+                session.id &&
+              x.eventId ===
+                eventId
             )
         );
-
 
       persist();
 
@@ -1629,20 +1507,16 @@ function bindMember() {
       toast(
         'Inscrição cancelada.'
       );
-
     }
-
   };
-
 }
 
 
 /* =========================================================
    SAIR
-   ========================================================= */
+========================================================= */
 
 function signOut() {
-
   session = null;
 
   persist();
@@ -1650,20 +1524,19 @@ function signOut() {
   renderHeader();
   renderFeatured();
   renderAdmin();
+  renderWhatsAppCommunity();
 
   toast(
     'Você saiu da sua conta.'
   );
-
 }
 
 
 /* =========================================================
    LOGIN / CADASTRO
-   ========================================================= */
+========================================================= */
 
 function openModal(tab) {
-
   const modal =
     $('#auth-modal');
 
@@ -1679,12 +1552,9 @@ function openModal(tab) {
   );
 
   switchTab(tab);
-
 }
 
-
 function closeModal() {
-
   const modal =
     $('#auth-modal');
 
@@ -1698,25 +1568,20 @@ function closeModal() {
     'aria-hidden',
     'true'
   );
-
 }
 
-
 function switchTab(tab) {
-
   document
     .querySelectorAll(
       '.auth-tabs .tab'
     )
     .forEach(x => {
-
       x.classList.toggle(
         'active',
-        x.dataset.tab === tab
+        x.dataset.tab ===
+          tab
       );
-
     });
-
 
   const login =
     $('#login-form');
@@ -1724,67 +1589,51 @@ function switchTab(tab) {
   const signup =
     $('#signup-form');
 
-
   if (login) {
-
     login.classList.toggle(
       'hidden',
       tab !== 'login'
     );
-
   }
 
-
   if (signup) {
-
     signup.classList.toggle(
       'hidden',
       tab !== 'signup'
     );
-
   }
-
 }
 
 
 /* =========================================================
    MODAL
-   ========================================================= */
+========================================================= */
 
 function initAuthModal() {
-
   const authModal =
     $('#auth-modal');
 
   if (!authModal) return;
 
-
   authModal.onclick = e => {
-
     if (
       e.target ===
       e.currentTarget
     ) {
-
       closeModal();
 
       return;
-
     }
-
 
     if (
       e.target.closest(
         '[data-close-modal]'
       )
     ) {
-
       closeModal();
 
       return;
-
     }
-
 
     const tabButton =
       e.target.closest(
@@ -1792,51 +1641,39 @@ function initAuthModal() {
       );
 
     if (tabButton) {
-
       switchTab(
         tabButton.dataset.tab
       );
-
     }
-
   };
-
 
   document.addEventListener(
     'keydown',
     e => {
-
       if (
-        e.key === 'Escape'
+        e.key ===
+        'Escape'
       ) {
-
         closeModal();
-
       }
-
     }
   );
-
 }
 
 
 /* =========================================================
    LOGIN
-   ========================================================= */
+========================================================= */
 
 function initLogin() {
-
   const loginForm =
     $('#login-form');
 
   if (!loginForm) return;
 
-
   loginForm.onsubmit =
     e => {
-
       e.preventDefault();
-
 
       const email =
         $('#login-email')
@@ -1844,11 +1681,9 @@ function initLogin() {
           .trim()
           .toLowerCase();
 
-
       const password =
         $('#login-password')
           .value;
-
 
       const found =
         users.find(
@@ -1860,26 +1695,19 @@ function initLogin() {
               password
         );
 
-
       if (!found) {
-
         const message =
           $('#login-message');
 
         if (message) {
-
           message.textContent =
             'E-mail ou senha incorretos.';
-
         }
 
         return;
-
       }
 
-
       session = {
-
         id:
           found.id,
 
@@ -1891,9 +1719,7 @@ function initLogin() {
 
         email:
           found.email
-
       };
-
 
       persist();
 
@@ -1902,42 +1728,36 @@ function initLogin() {
       renderHeader();
       renderFeatured();
       renderAdmin();
+      renderWhatsAppCommunity();
 
       toast(
         `Bem-vindo(a), ${
           session.name.split(' ')[0]
         }!`
       );
-
     };
-
 }
 
 
 /* =========================================================
    CADASTRO
-   ========================================================= */
+========================================================= */
 
 function initSignup() {
-
   const signupForm =
     $('#signup-form');
 
   if (!signupForm) return;
 
-
   signupForm.onsubmit =
     e => {
-
       e.preventDefault();
-
 
       const email =
         $('#signup-email')
           .value
           .trim()
           .toLowerCase();
-
 
       if (
         users.some(
@@ -1947,24 +1767,18 @@ function initSignup() {
             email
         )
       ) {
-
         const message =
           $('#signup-message');
 
         if (message) {
-
           message.textContent =
             'Este e-mail já possui uma conta.';
-
         }
 
         return;
-
       }
 
-
       const u = {
-
         id:
           uid(),
 
@@ -1985,15 +1799,11 @@ function initSignup() {
 
         createdAt:
           new Date().toISOString()
-
       };
-
 
       users.push(u);
 
-
       session = {
-
         id:
           u.id,
 
@@ -2005,9 +1815,7 @@ function initSignup() {
 
         email:
           u.email
-
       };
-
 
       persist();
 
@@ -2015,31 +1823,28 @@ function initSignup() {
 
       renderHeader();
       renderPopulation();
+      renderFeatured();
       renderAdmin();
+      renderWhatsAppCommunity();
 
       toast(
         'Sua conta foi criada. Bem-vindo(a)!'
       );
-
     };
-
 }
 
 
 /* =========================================================
    CLIQUE NO EVENTO
-   ========================================================= */
+========================================================= */
 
 function initFeaturedEvent() {
-
   const featured =
     $('#featured-event');
 
   if (!featured) return;
 
-
   featured.onclick = e => {
-
     const button =
       e.target.closest(
         '[data-enroll]'
@@ -2047,15 +1852,12 @@ function initFeaturedEvent() {
 
     if (!button) return;
 
-
     const eventId =
       button.dataset.enroll;
 
     if (!eventId) return;
 
-
     if (!session) {
-
       openModal('login');
 
       toast(
@@ -2063,25 +1865,21 @@ function initFeaturedEvent() {
       );
 
       return;
-
     }
-
 
     if (
       enrollments.some(
         x =>
-          x.eventId === eventId &&
-          x.userId === session.id
+          x.eventId ===
+            eventId &&
+          x.userId ===
+            session.id
       )
     ) {
-
       return;
-
     }
 
-
     enrollments.push({
-
       id:
         uid(),
 
@@ -2092,9 +1890,7 @@ function initFeaturedEvent() {
 
       createdAt:
         new Date().toISOString()
-
     });
-
 
     persist();
 
@@ -2104,20 +1900,17 @@ function initFeaturedEvent() {
     toast(
       'Inscrição confirmada! Nos vemos no evento.'
     );
-
   };
-
 }
 
 
 /* =========================================================
    INICIALIZAÇÃO
-   ========================================================= */
+========================================================= */
 
 document.addEventListener(
   'DOMContentLoaded',
   () => {
-
     persist();
 
     initMobileMenu();
@@ -2140,5 +1933,6 @@ document.addEventListener(
 
     renderAdmin();
 
+    renderWhatsAppCommunity();
   }
 );
