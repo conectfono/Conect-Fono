@@ -6,6 +6,7 @@ const supabaseClient = window.supabase.createClient(
   SUPABASE_URL,
   SUPABASE_PUBLISHABLE_KEY
 );
+console.log('CONECT FONO: Supabase conectado', supabaseClient);
 
 const DB = {
   events: 'connect-fono-events-v2',
