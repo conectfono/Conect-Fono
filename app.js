@@ -1,3 +1,12 @@
+const SUPABASE_URL = 'https://drwtzwcgkqwealesdutq.supabase.co';
+
+const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_ULtSY8GdvicDrtcDBamJfw__x51Pyg1';
+
+const supabaseClient = window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_PUBLISHABLE_KEY
+);
+
 const DB = {
   events: 'connect-fono-events-v2',
   users: 'connect-fono-users-v1',
