@@ -1676,76 +1676,56 @@ function initAuthModal() {
 ========================================================= */
 
 function initLogin() {
-  const loginForm =
-    $('#login-form');
+  const form = document.querySelector('#loginForm');
+  if (!form) return;
 
-  if (!loginForm) return;
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
 
-  loginForm.onsubmit =
-    e => {
-      e.preventDefault();
+    const email = document.querySelector('#loginEmail')?.value.trim();
+    const password = document.querySelector('#loginPassword')?.value;
 
-      const email =
-        $('#login-email')
-          .value
-          .trim()
-          .toLowerCase();
+    if (!email || !password) {
+      alert('Informe seu e-mail e sua senha.');
+      return;
+    }
 
-      const password =
-        $('#login-password')
-          .value;
+    const { data, error } = await supabaseClient.auth.signInWithPassword({
+      email,
+      password
+    });
 
-      const found =
-        users.find(
-          u =>
-            u.email
-              .toLowerCase() ===
-              email &&
-            u.password ===
-              password
-        );
+    if (error) {
+      console.error('Erro no login:', error);
+      alert('Não foi possível entrar. Verifique seu e-mail e sua senha.');
+      return;
+    }
 
-      if (!found) {
-        const message =
-          $('#login-message');
+    const user = data.user;
 
-        if (message) {
-          message.textContent =
-            'E-mail ou senha incorretos.';
-        }
+    const { data: profile, error: profileError } = await supabaseClient
+      .from('profiles')
+      .select('id, name, email, role')
+      .eq('id', user.id)
+      .single();
 
-        return;
-      }
+    if (profileError) {
+      console.error('Erro ao carregar perfil:', profileError);
+      alert('Login realizado, mas não foi possível carregar seu perfil.');
+      return;
+    }
 
-      session = {
-        id:
-          found.id,
-
-        name:
-          found.name,
-
-        role:
-          found.role,
-
-        email:
-          found.email
-      };
-
-      persist();
-
-      closeModal();
-
-      renderHeader();
-      renderFeatured();
-      renderAdmin();
-      renderWhatsAppCommunity();
-
-      toast(
-        `Bem-vindo(a), ${
-          session.name.split(' ')[0]
-        }!`
-      );
+    session = {
+      id: profile.id,
+      name: profile.name,
+      email: profile.email,
+      role: profile.role
     };
+
+    persist();
+
+    window.location.href = 'portal.html';
+  });
 }
 
 
