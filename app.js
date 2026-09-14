@@ -1848,7 +1848,7 @@ function initFeaturedEvent() {
 
   if (!featured) return;
 
-  featured.onclick = e => {
+  featured.onclick = async e => {
     const button =
       e.target.closest(
         '[data-enroll]'
