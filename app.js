@@ -1526,9 +1526,16 @@ function bindMember() {
    SAIR
 ========================================================= */
 
-function signOut() {
-  session = null;
+async function signOut() {
+  const { error } = await supabaseClient.auth.signOut();
 
+  if (error) {
+    console.error('Erro ao sair:', error);
+    alert('Não foi possível sair da conta.');
+    return;
+  }
+
+  session = null;
   persist();
 
   renderHeader();
