@@ -103,7 +103,21 @@ async function syncSupabaseSession() {
     role: profile.role
   };
 }
+async function loadEventsFromSupabase() {
+  const { data, error } = await supabaseClient
+    .from('events')
+    .select('*')
+    .order('date', { ascending: true });
 
+  if (error) {
+    console.error('Erro ao carregar eventos:', error);
+    return;
+  }
+
+  if (data && data.length > 0) {
+    events = data;
+  }
+}
 
 /* =========================================================
    FUNÇÕES GERAIS
@@ -1902,6 +1916,8 @@ document.addEventListener(
   'DOMContentLoaded',
   async () => {
     await syncSupabaseSession();
+
+    await loadEventsFromSupabase();
 
     persist();
 
