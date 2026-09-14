@@ -1734,93 +1734,53 @@ function initLogin() {
 ========================================================= */
 
 function initSignup() {
-  const signupForm =
-    $('#signup-form');
+  const form = document.querySelector('#signup-form');
+  if (!form) return;
 
-  if (!signupForm) return;
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
 
-  signupForm.onsubmit =
-    e => {
-      e.preventDefault();
+    const name = document.querySelector('#signup-name')?.value.trim();
+    const email = document.querySelector('#signup-email')?.value.trim();
+    const password = document.querySelector('#signup-password')?.value;
+    const role = document.querySelector('#signup-role')?.value || 'student';
 
-      const email =
-        $('#signup-email')
-          .value
-          .trim()
-          .toLowerCase();
+    if (!name || !email || !password) {
+      alert('Preencha todos os campos.');
+      return;
+    }
 
-      if (
-        users.some(
-          u =>
-            u.email
-              .toLowerCase() ===
-            email
-        )
-      ) {
-        const message =
-          $('#signup-message');
+    if (password.length < 6) {
+      alert('A senha deve ter pelo menos 6 caracteres.');
+      return;
+    }
 
-        if (message) {
-          message.textContent =
-            'Este e-mail já possui uma conta.';
+    const { data, error } = await supabaseClient.auth.signUp({
+      email,
+      password,
+      options: {
+        data: {
+          name,
+          role
         }
-
-        return;
       }
+    });
 
-      const u = {
-        id:
-          uid(),
+    if (error) {
+      console.error('Erro no cadastro:', error);
+      alert(error.message || 'Não foi possível criar sua conta.');
+      return;
+    }
 
-        name:
-          $('#signup-name')
-            .value
-            .trim(),
+    if (!data.user) {
+      alert('Não foi possível criar a conta.');
+      return;
+    }
 
-        email,
+    alert('Conta criada com sucesso!');
 
-        password:
-          $('#signup-password')
-            .value,
-
-        role:
-          $('#signup-role')
-            .value,
-
-        createdAt:
-          new Date().toISOString()
-      };
-
-      users.push(u);
-
-      session = {
-        id:
-          u.id,
-
-        name:
-          u.name,
-
-        role:
-          u.role,
-
-        email:
-          u.email
-      };
-
-      persist();
-
-      closeModal();
-
-      renderHeader();
-      renderPopulation();
-      renderFeatured();
-      renderAdmin();
-      renderWhatsAppCommunity();
-
-      toast(
-        'Sua conta foi criada. Bem-vindo(a)!'
-      );
-    };
+    window.location.reload();
+  });
 }
 
 
