@@ -70,6 +70,39 @@ let events = get(DB.events, defaults);
 let users = get(DB.users, [seedAdmin]);
 let enrollments = get(DB.enrollments, []);
 let session = get(DB.session, null);
+async function syncSupabaseSession() {
+  const { data, error } = await supabaseClient.auth.getSession();
+
+  if (error) {
+    console.error('Erro ao recuperar sessão:', error);
+    return;
+  }
+
+  const user = data.session?.user;
+
+  if (!user) {
+    session = null;
+    return;
+  }
+
+  const { data: profile, error: profileError } = await supabaseClient
+    .from('profiles')
+    .select('id, name, email, role')
+    .eq('id', user.id)
+    .single();
+
+  if (profileError) {
+    console.error('Erro ao carregar perfil:', profileError);
+    return;
+  }
+
+  session = {
+    id: profile.id,
+    name: profile.name,
+    email: profile.email,
+    role: profile.role
+  };
+}
 
 
 /* =========================================================
