@@ -1900,7 +1900,9 @@ function initFeaturedEvent() {
 
 document.addEventListener(
   'DOMContentLoaded',
-  () => {
+  async () => {
+    await syncSupabaseSession();
+
     persist();
 
     initMobileMenu();
