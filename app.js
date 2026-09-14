@@ -1883,27 +1883,25 @@ function initFeaturedEvent() {
       return;
     }
 
-    enrollments.push({
-      id:
-        uid(),
+    const { error } = await supabaseClient
+  .from('enrollments')
+  .insert({
+    user_id: session.id,
+    event_id: eventId
+  });
 
-      eventId,
+if (error) {
+  console.error('Erro ao realizar inscrição:', error);
+  toast('Não foi possível realizar a inscrição.');
+  return;
+}
 
-      userId:
-        session.id,
+renderFeatured();
+renderAdmin();
 
-      createdAt:
-        new Date().toISOString()
-    });
-
-    persist();
-
-    renderFeatured();
-    renderAdmin();
-
-    toast(
-      'Inscrição confirmada! Nos vemos no evento.'
-    );
+toast(
+  'Inscrição confirmada! Nos vemos no evento.'
+);
   };
 }
 
