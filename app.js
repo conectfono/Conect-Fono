@@ -1676,14 +1676,14 @@ function initAuthModal() {
 ========================================================= */
 
 function initLogin() {
-  const form = document.querySelector('#loginForm');
+  const form = document.querySelector('#login-form');
   if (!form) return;
 
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
 
-    const email = document.querySelector('#loginEmail')?.value.trim();
-    const password = document.querySelector('#loginPassword')?.value;
+    const email = document.querySelector('#login-email')?.value.trim();
+    const password = document.querySelector('#login-password')?.value;
 
     if (!email || !password) {
       alert('Informe seu e-mail e sua senha.');
