@@ -137,6 +137,14 @@ async function loadEnrollmentsFromSupabase() {
   }));
 }
 
+  enrollments = (data || []).map(x => ({
+    id: x.id,
+    userId: x.user_id,
+    eventId: x.event_id,
+    createdAt: x.created_at
+  }));
+}
+
 /* =========================================================
    FUNÇÕES GERAIS
 ========================================================= */
