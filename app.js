@@ -485,7 +485,7 @@ function renderFeatured() {
 
   const enrolled =
     session &&
-    .some(
+    enrollments.some(
       x =>
         x.eventId === e.id &&
         x.userId === session.id
