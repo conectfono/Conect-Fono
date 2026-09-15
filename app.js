@@ -126,7 +126,7 @@ async function loadEventsFromSupabase() {
 function persist() {
   put(DB.events, events);
   put(DB.users, users);
-  put(DB., );
+  put(DB.enrollments, enrollments);
   put(DB.session, session);
 }
 
