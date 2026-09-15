@@ -68,7 +68,7 @@ const put = (key, value) => {
 
 let events = get(DB.events, defaults);
 let users = get(DB.users, [seedAdmin]);
-let enrollments = get(DB.enrollments, []);
+let  = get(DB., []);
 let session = get(DB.session, null);
 async function syncSupabaseSession() {
   const { data, error } = await supabaseClient.auth.getSession();
@@ -126,7 +126,7 @@ async function loadEventsFromSupabase() {
 function persist() {
   put(DB.events, events);
   put(DB.users, users);
-  put(DB.enrollments, enrollments);
+  put(DB., );
   put(DB.session, session);
 }
 
@@ -485,7 +485,7 @@ function renderFeatured() {
 
   const enrolled =
     session &&
-    enrollments.some(
+    .some(
       x =>
         x.eventId === e.id &&
         x.userId === session.id
@@ -1532,7 +1532,7 @@ function bindMember() {
 
   if (!panel) return;
 
-  panel.onclick = e => {
+  panel.onclick = async e => {
     const button =
       e.target.closest(
         '[data-cancel-enrollment]'
@@ -1544,27 +1544,33 @@ function bindMember() {
       button.dataset
         .cancelEnrollment;
 
-    if (eventId) {
-      enrollments =
-        enrollments.filter(
-          x =>
-            !(
-              x.userId ===
-                session.id &&
-              x.eventId ===
-                eventId
-            )
-        );
+    if (!eventId) return;
 
-      persist();
+    const { error } = await supabaseClient
+      .from('enrollments')
+      .delete()
+      .eq('user_id', session.id)
+      .eq('event_id', eventId);
 
-      renderFeatured();
-      renderAdmin();
+    if (error) {
+      console.error(
+        'Erro ao cancelar inscrição:',
+        error
+      );
 
       toast(
-        'Inscrição cancelada.'
+        'Não foi possível cancelar a inscrição.'
       );
+
+      return;
     }
+
+    renderFeatured();
+    renderAdmin();
+
+    toast(
+      'Inscrição cancelada.'
+    );
   };
 }
 
