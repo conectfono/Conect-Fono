@@ -119,6 +119,24 @@ async function loadEventsFromSupabase() {
   }
 }
 
+async function loadEnrollmentsFromSupabase() {
+  const { data, error } = await supabaseClient
+    .from('enrollments')
+    .select('*');
+
+  if (error) {
+    console.error('Erro ao carregar inscrições:', error);
+    return;
+  }
+
+  enrollments = (data || []).map(x => ({
+    id: x.id,
+    userId: x.user_id,
+    eventId: x.event_id,
+    createdAt: x.created_at
+  }));
+}
+
 /* =========================================================
    FUNÇÕES GERAIS
 ========================================================= */
@@ -1919,6 +1937,8 @@ document.addEventListener(
   'DOMContentLoaded',
   async () => {
     await syncSupabaseSession();
+    
+    await loadEnrollmentsFromSupabase();
 
     await loadEventsFromSupabase();
 
