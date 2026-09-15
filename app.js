@@ -1,75 +1,24 @@
-const SUPABASE_URL = 'https://drwtzwcgkqwealesdutq.supabase.co';
+/* Supabase accepts only publishable/anon keys in browser code. Never place a
+   service_role key here. Configure these attributes in the production HTML. */
+const config = document.documentElement.dataset;
+const SUPABASE_URL = config.supabaseUrl;
+const SUPABASE_PUBLISHABLE_KEY = config.supabaseKey;
 
-const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_ULtSY8GdvicDrtcDBamJfw__x51Pyg1';
+if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY || !window.supabase) {
+  throw new Error('Configuração pública do Supabase ausente.');
+}
 
 const supabaseClient = window.supabase.createClient(
   SUPABASE_URL,
   SUPABASE_PUBLISHABLE_KEY
 );
-console.log('CONECT FONO: Supabase conectado', supabaseClient);
-
-const DB = {
-  events: 'connect-fono-events-v2',
-  users: 'connect-fono-users-v1',
-  enrollments: 'connect-fono-enrollments-v1',
-  session: 'connect-fono-session-v1'
-};
-
-const defaults = [
-  {
-    id: 'fono-experience',
-    title: 'Fono Experience 2026',
-    date: '2026-10-18',
-    place: 'Natal, RN',
-    description:
-      'Um dia inteiro de conhecimento, troca e experiências reais.',
-    status: 'scheduled',
-    featured: true
-  }
-];
-
-const seedAdmin = {
-  id: 'admin-connect',
-  name: 'Admin CONECT',
-  email: 'admin@connectfono.com',
-  password: 'connect2026',
-  role: 'admin',
-  createdAt: '2026-01-01'
-};
 
 const $ = s => document.querySelector(s);
 
-const uid = () => {
-  if (window.crypto && crypto.randomUUID) {
-    return crypto.randomUUID();
-  }
-
-  return (
-    'id-' +
-    Date.now() +
-    '-' +
-    Math.random().toString(16).slice(2)
-  );
-};
-
-const get = (key, fallback = []) => {
-  try {
-    const value = JSON.parse(localStorage.getItem(key));
-
-    return value !== null ? value : fallback;
-  } catch {
-    return fallback;
-  }
-};
-
-const put = (key, value) => {
-  localStorage.setItem(key, JSON.stringify(value));
-};
-
-let events = get(DB.events, defaults);
-let users = get(DB.users, [seedAdmin]);
-let enrollments = get(DB.enrollments, []);
-let session = get(DB.session, null);
+let events = [];
+let users = [];
+let enrollments = [];
+let session = null;
 async function syncSupabaseSession() {
   const { data, error } = await supabaseClient.auth.getSession();
 
@@ -114,35 +63,48 @@ async function loadEventsFromSupabase() {
     return;
   }
 
-  if (data && data.length > 0) {
-    events = data;
+  events = data || [];
+}
+
+async function loadProfilesFromSupabase() {
+  if (!adminGuard()) return;
+
+  const { data, error } = await supabaseClient
+    .from('profiles')
+    .select('id, name, email, role, created_at')
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    console.error('Erro ao carregar perfis:', error);
+    toast('Não foi possível carregar os cadastros.');
+    return;
   }
+
+  users = data || [];
 }
 
 async function loadEnrollmentsFromSupabase() {
   const { data, error } = await supabaseClient
     .from('enrollments')
-    .select('*');
+    .select('id, user_id, event_id, created_at');
 
   if (error) {
     console.error('Erro ao carregar inscrições:', error);
     return;
   }
 
-  enrollments = (data || []).map(x => ({
-    id: x.id,
-    userId: x.user_id,
-    eventId: x.event_id,
-    createdAt: x.created_at
+  enrollments = (data || []).map(row => ({
+    id: row.id,
+    userId: row.user_id,
+    eventId: row.event_id,
+    createdAt: row.created_at
   }));
 }
 
-  enrollments = (data || []).map(x => ({
-    id: x.id,
-    userId: x.user_id,
-    eventId: x.event_id,
-    createdAt: x.created_at
-  }));
+async function refreshData() {
+  await loadEventsFromSupabase();
+  await loadEnrollmentsFromSupabase();
+  await loadProfilesFromSupabase();
 }
 
 /* =========================================================
@@ -150,10 +112,7 @@ async function loadEnrollmentsFromSupabase() {
 ========================================================= */
 
 function persist() {
-  put(DB.events, events);
-  put(DB.users, users);
-  put(DB.enrollments, enrollments);
-  put(DB.session, session);
+  // State is intentionally in-memory only. Supabase is the source of truth.
 }
 
 const escapeHTML = value =>
@@ -1054,16 +1013,13 @@ function bindAdmin() {
     $('#event-form');
 
   if (form) {
-    form.onsubmit = ev => {
+    form.onsubmit = async ev => {
       ev.preventDefault();
 
       const id =
         $('#event-id').value;
 
       const item = {
-        id:
-          id || uid(),
-
         title:
           $('#title')
             .value
@@ -1089,30 +1045,21 @@ function bindAdmin() {
 
         featured:
           $('#featured')
-            .checked
+          .checked
       };
 
-      if (item.featured) {
-        events.forEach(
-          e =>
-            e.featured = false
-        );
+      const request = id
+        ? supabaseClient.from('events').update(item).eq('id', id)
+        : supabaseClient.from('events').insert(item);
+      const { error } = await request;
+
+      if (error) {
+        console.error('Erro ao salvar evento:', error);
+        toast('Não foi possível salvar o evento.');
+        return;
       }
 
-      if (id) {
-        events =
-          events.map(
-            e =>
-              e.id === id
-                ? item
-                : e
-          );
-      } else {
-        events.push(item);
-      }
-
-      persist();
-
+      await refreshData();
       renderFeatured();
       renderAdmin();
 
@@ -1144,7 +1091,7 @@ function bindAdmin() {
    CLIQUES DO ADMIN
 ========================================================= */
 
-function adminClick(ev) {
+async function adminClick(ev) {
   const managerButton =
     ev.target.closest(
       '[data-manager]'
@@ -1166,41 +1113,9 @@ function adminClick(ev) {
     );
 
   if (removeUserButton) {
-    const id =
-      removeUserButton.dataset
-        .removeUser;
-
-    if (
-      id &&
-      confirm(
-        'Remover este cadastro?'
-      )
-    ) {
-      users =
-        users.filter(
-          u =>
-            u.id !== id
-        );
-
-      enrollments =
-        enrollments.filter(
-          x =>
-            x.userId !== id
-        );
-
-      persist();
-
-      renderPopulation();
-
-      renderManagerSection(
-        'people'
-      );
-
-      toast(
-        'Cadastro removido.'
-      );
-    }
-
+    /* Auth users must only be removed by a protected server-side action.
+       The browser is deliberately not allowed to delete accounts. */
+    toast('A exclusão de contas deve ser feita no painel seguro do Supabase.');
     return;
   }
 
@@ -1220,13 +1135,18 @@ function adminClick(ev) {
         'Cancelar esta inscrição?'
       )
     ) {
-      enrollments =
-        enrollments.filter(
-          x =>
-            x.id !== id
-        );
+      const { error } = await supabaseClient
+        .from('enrollments')
+        .delete()
+        .eq('id', id);
 
-      persist();
+      if (error) {
+        console.error('Erro ao cancelar inscrição:', error);
+        toast('Não foi possível cancelar a inscrição.');
+        return;
+      }
+
+      await refreshData();
 
       renderManagerSection(
         'enrollments'
@@ -1255,19 +1175,18 @@ function adminClick(ev) {
         'Excluir este evento?'
       )
     ) {
-      events =
-        events.filter(
-          e =>
-            e.id !== id
-        );
+      const { error } = await supabaseClient
+        .from('events')
+        .delete()
+        .eq('id', id);
 
-      enrollments =
-        enrollments.filter(
-          x =>
-            x.eventId !== id
-        );
+      if (error) {
+        console.error('Erro ao excluir evento:', error);
+        toast('Não foi possível excluir o evento.');
+        return;
+      }
 
-      persist();
+      await refreshData();
 
       renderFeatured();
       renderAdmin();
@@ -1591,6 +1510,7 @@ function bindMember() {
       return;
     }
 
+    await refreshData();
     renderFeatured();
     renderAdmin();
 
@@ -1614,7 +1534,9 @@ async function signOut() {
   }
 
   session = null;
-  persist();
+  events = [];
+  users = [];
+  enrollments = [];
 
   renderHeader();
   renderFeatured();
@@ -1807,8 +1729,6 @@ function initLogin() {
       role: profile.role
     };
 
-    persist();
-
     window.location.href = 'portal.html';
   });
 }
@@ -1914,25 +1834,26 @@ function initFeaturedEvent() {
       return;
     }
 
-const { error } = await supabaseClient
-  .from('enrollments')
-  .insert({
-    user_id: session.id,
-    event_id: eventId
-  });
+    const { error } = await supabaseClient
+      .from('enrollments')
+      .insert({
+        user_id: session.id,
+        event_id: eventId
+      });
 
-if (error) {
-  console.error('Erro ao realizar inscrição:', error);
-  toast('Não foi possível realizar a inscrição.');
-  return;
-}
+    if (error) {
+      console.error('Erro ao realizar inscrição:', error);
+      toast(error.code === '23505'
+        ? 'Você já está inscrito neste evento.'
+        : 'Não foi possível realizar a inscrição.');
+      return;
+    }
 
-renderFeatured();
-renderAdmin();
+    await refreshData();
+    renderFeatured();
+    renderAdmin();
 
-toast(
-  'Inscrição confirmada! Nos vemos no evento.'
-);
+    toast('Inscrição confirmada! Nos vemos no evento.');
   };
 }
 
@@ -1945,12 +1866,8 @@ document.addEventListener(
   'DOMContentLoaded',
   async () => {
     await syncSupabaseSession();
-    
-    await loadEnrollmentsFromSupabase();
 
-    await loadEventsFromSupabase();
-
-    persist();
+    await refreshData();
 
     initMobileMenu();
 
