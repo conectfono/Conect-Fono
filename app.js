@@ -1888,7 +1888,7 @@ function initFeaturedEvent() {
       return;
     }
 
-    const { error } = await supabaseClient
+const { error } = await supabaseClient
   .from('enrollments')
   .insert({
     user_id: session.id,
