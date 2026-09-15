@@ -68,7 +68,7 @@ const put = (key, value) => {
 
 let events = get(DB.events, defaults);
 let users = get(DB.users, [seedAdmin]);
-let  = get(DB., []);
+let enrollments = get(DB.enrollments, []);
 let session = get(DB.session, null);
 async function syncSupabaseSession() {
   const { data, error } = await supabaseClient.auth.getSession();
