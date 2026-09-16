@@ -67,9 +67,14 @@ async function loadEntries() {
 
   entriesContainer.innerHTML = entries.map(entry => `
     <article class="card">
-      <h2>${entry.title}</h2>
-      <p>${entry.description || ''}</p>
-    </article>
+  <h2>${entry.title}</h2>
+  <p>${entry.description || ''}</p>
+  ${
+    entry.url
+      ? `<a href="${entry.url}" target="_blank" rel="noopener noreferrer">Acessar conteúdo →</a>`
+      : ''
+  }
+</article>
   `).join('');
 }
 
