@@ -49,7 +49,7 @@ async function loadEntries() {
   const { data, error } = await supabaseClient
     .from('content_entries')
     .select('*')
-    .eq('category', area)
+    .eq('area', area)
     .order('created_at', { ascending: false });
 
   if (error) {
