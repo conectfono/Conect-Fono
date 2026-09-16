@@ -807,6 +807,13 @@ function manager() {
       >
         Inscrições (${enrollments.length})
       </button>
+      
+<button
+  class="manager-tab"
+  data-manager="content"
+>
+  Conteúdos
+</button>
 
     </div>
 
