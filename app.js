@@ -1467,27 +1467,7 @@ function renderManagerSection(tab) {
      
   }
 if (tab === 'content') {
-  content.innerHTML = `
-    <div class="manager-list">
-
-      <h3>Conteúdos</h3>
-
-      <p>
-        Acesse a área de conteúdos para visualizar e gerenciar
-        materiais publicados no CONECT FONO.
-      </p>
-
-      <a
-        href="portal.html?area=conteudos"
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        Abrir Conteúdos →
-      </a>
-
-    </div>
-  `;
-
+  content.innerHTML = contentManager();
   return;
 }
    
