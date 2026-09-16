@@ -752,6 +752,91 @@ function eventList() {
    ADMIN
 ========================================================= */
 
+function contentManager() {
+  return `
+    <div class="manager-list">
+
+      <h3>Gerenciar conteúdos</h3>
+
+      <form id="content-form">
+
+        <input
+          type="hidden"
+          id="content-id"
+        />
+
+        <label>
+          Área
+          <select id="content-area" required>
+            <option value="conteudos">Conteúdos</option>
+            <option value="oportunidades">Oportunidades</option>
+            <option value="pesquisa">Ciência & Pesquisa</option>
+            <option value="projetos">Projetos</option>
+          </select>
+        </label>
+
+        <label>
+          Título
+          <input
+            id="content-title"
+            required
+            placeholder="Título do conteúdo"
+          />
+        </label>
+
+        <label>
+          Descrição
+          <textarea
+            id="content-description"
+            required
+            placeholder="Descrição do conteúdo"
+          ></textarea>
+        </label>
+
+        <label>
+          Link
+          <input
+            id="content-url"
+            type="url"
+            placeholder="https://..."
+          />
+        </label>
+
+        <label>
+          Tipo
+          <select id="content-type">
+            <option value="material">Material</option>
+            <option value="artigo">Artigo</option>
+            <option value="video">Vídeo</option>
+            <option value="oportunidade">Oportunidade</option>
+            <option value="pesquisa">Pesquisa</option>
+            <option value="projeto">Projeto</option>
+          </select>
+        </label>
+
+        <label>
+          <input
+            type="checkbox"
+            id="content-published"
+            checked
+          />
+          Publicado
+        </label>
+
+        <button type="submit">
+          Salvar conteúdo
+        </button>
+
+      </form>
+
+      <div id="content-list">
+        <p>Nenhum conteúdo carregado.</p>
+      </div>
+
+    </div>
+  `;
+}
+
 function manager() {
   return `
     <div class="member-top">
