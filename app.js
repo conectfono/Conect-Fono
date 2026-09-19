@@ -1213,13 +1213,14 @@ function bindAdmin() {
       const id = $('#content-id').value;
 
       const item = {
-        area: $('#content-area').value,
-        title: $('#content-title').value.trim(),
-        description: $('#content-description').value.trim(),
-        url: $('#content-url').value.trim() || null,
-        content_type: $('#content-type').value,
-        published: $('#content-published').checked
-      };
+  area: $('#content-area').value,
+  title: $('#content-title').value.trim(),
+  description: $('#content-description').value.trim(),
+  url: $('#content-url').value.trim() || null,
+  cover_url: $('#content-cover').value.trim() || null,
+  content_type: $('#content-type').value,
+  published: $('#content-published').checked
+};
 
       const request = id
         ? supabaseClient
