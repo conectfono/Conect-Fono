@@ -118,65 +118,62 @@ async function loadEntries() {
         area === 'projetos';
 
       if (isBlog) {
-        return `
-          <article class="card">
+  return `
+    <article class="card">
 
-            ${
-              entry.cover_url
-                ? `
-                  <img
-                    src="${escapeHTML(entry.cover_url)}"
-                    alt="${escapeHTML(entry.title)}"
-                    loading="lazy"
-                  />
-                `
-                : ''
-            }
-
-            <div>
-              <small>
-                ${
-                  entry.author_name
-                    ? `Por ${escapeHTML(entry.author_name)}`
-                    : ''
-                }
-
-                ${
-                  entry.published_at
-                    ? ` · ${formatDate(entry.published_at)}`
-                    : ''
-                }
-              </small>
-
-              <h2>
-                ${escapeHTML(entry.title)}
-              </h2>
-
-              <p>
-                ${escapeHTML(entry.description || '')}
-              </p>
-
-              ${
-                entry.body
-                  ? `
-                    <details>
-                      <summary>
-                        Ler publicação →
-                      </summary>
-
-                      <div>
-                        ${escapeHTML(entry.body)}
-                      </div>
-                    </details>
-                  `
-                  : ''
-              }
-
-            </div>
-
-          </article>
-        `;
+      ${
+        entry.cover_url
+          ? `
+            <img
+              src="${escapeHTML(entry.cover_url)}"
+              alt="${escapeHTML(entry.title)}"
+              loading="lazy"
+            />
+          `
+          : ''
       }
+
+      <div>
+
+        <small>
+          ${
+            entry.author_name
+              ? `Por ${escapeHTML(entry.author_name)}`
+              : ''
+          }
+
+          ${
+            entry.published_at
+              ? ` · ${formatDate(entry.published_at)}`
+              : ''
+          }
+        </small>
+
+        <h2>
+          ${escapeHTML(entry.title)}
+        </h2>
+
+        <p>
+          ${escapeHTML(entry.description || '')}
+        </p>
+
+        ${
+          entry.slug
+            ? `
+              <a
+                href="portal.html?area=${encodeURIComponent(area)}&post=${encodeURIComponent(entry.slug)}"
+              >
+                Ler publicação →
+              </a>
+            `
+            : ''
+        }
+
+      </div>
+
+    </article>
+  `;
+}
 
       return `
         <article class="card">
