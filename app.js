@@ -19,6 +19,7 @@ let events = [];
 let users = [];
 let enrollments = [];
 let session = null;
+let contentEntries = [];
 async function syncSupabaseSession() {
   const { data, error } = await supabaseClient.auth.getSession();
 
