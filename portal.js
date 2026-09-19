@@ -60,6 +60,30 @@ const emptyState = () => `
   </div>
 `;
 
+const privateAreaState = () => `
+  <div class="empty">
+    <div style="font-size: 2.5rem; margin-bottom: 1rem;">
+      🔒
+    </div>
+
+    <h2>
+      Área exclusiva para membros
+    </h2>
+
+    <p>
+      Faça login ou crie sua conta para acessar
+      conteúdos e oportunidades da comunidade
+      CONECT FONO.
+    </p>
+
+    <p style="margin-top: 1.5rem;">
+      <a href="index.html">
+        Entrar ou criar minha conta →
+      </a>
+    </p>
+  </div>
+`;
+
 const formatDate = date => {
   if (!date) return '';
 
@@ -87,6 +111,26 @@ async function loadPost() {
 
   const entriesContainer =
     document.querySelector('#entries');
+
+  const privateArea =
+    area === 'conteudos' ||
+    area === 'oportunidades';
+
+  if (privateArea) {
+    const { data: { session } } =
+      await supabaseClient.auth.getSession();
+
+    if (!session) {
+      postContainer.hidden = false;
+
+      postContainer.innerHTML =
+        privateAreaState();
+
+      entriesContainer.hidden = true;
+
+      return;
+    }
+  }
 
   const { data: post, error } =
     await supabaseClient
@@ -127,7 +171,11 @@ async function loadPost() {
   document.querySelector('#eyebrow').textContent =
     area === 'pesquisa'
       ? 'CIÊNCIA & PESQUISA'
-      : 'PROJETOS';
+      : area === 'projetos'
+        ? 'PROJETOS'
+        : area === 'conteudos'
+          ? 'CONTEÚDOS'
+          : 'OPORTUNIDADES';
 
   document.querySelector('#title').textContent =
     post.title;
@@ -199,6 +247,22 @@ async function loadPost() {
 }
 
 async function loadEntries() {
+  const privateArea =
+    area === 'conteudos' ||
+    area === 'oportunidades';
+
+  if (privateArea) {
+    const { data: { session } } =
+      await supabaseClient.auth.getSession();
+
+    if (!session) {
+      entriesContainer.innerHTML =
+        privateAreaState();
+
+      return;
+    }
+  }
+
   const { data, error } =
     await supabaseClient
       .from('content_entries')
@@ -242,62 +306,62 @@ async function loadEntries() {
         area === 'projetos';
 
       if (isBlog) {
-  return `
-    <article class="card">
+        return `
+          <article class="card">
 
-      ${
-        entry.cover_url
-          ? `
-            <img
-              src="${escapeHTML(entry.cover_url)}"
-              alt="${escapeHTML(entry.title)}"
-              loading="lazy"
-            />
-          `
-          : ''
+            ${
+              entry.cover_url
+                ? `
+                  <img
+                    src="${escapeHTML(entry.cover_url)}"
+                    alt="${escapeHTML(entry.title)}"
+                    loading="lazy"
+                  />
+                `
+                : ''
+            }
+
+            <div>
+
+              <small>
+                ${
+                  entry.author_name
+                    ? `Por ${escapeHTML(entry.author_name)}`
+                    : ''
+                }
+
+                ${
+                  entry.published_at
+                    ? ` · ${formatDate(entry.published_at)}`
+                    : ''
+                }
+              </small>
+
+              <h2>
+                ${escapeHTML(entry.title)}
+              </h2>
+
+              <p>
+                ${escapeHTML(entry.description || '')}
+              </p>
+
+              ${
+                entry.slug
+                  ? `
+                    <a
+                      href="portal.html?area=${encodeURIComponent(area)}&post=${encodeURIComponent(entry.slug)}"
+                    >
+                      Ler publicação →
+                    </a>
+                  `
+                  : ''
+              }
+
+            </div>
+
+          </article>
+        `;
       }
-
-      <div>
-
-        <small>
-          ${
-            entry.author_name
-              ? `Por ${escapeHTML(entry.author_name)}`
-              : ''
-          }
-
-          ${
-            entry.published_at
-              ? ` · ${formatDate(entry.published_at)}`
-              : ''
-          }
-        </small>
-
-        <h2>
-          ${escapeHTML(entry.title)}
-        </h2>
-
-        <p>
-          ${escapeHTML(entry.description || '')}
-        </p>
-
-        ${
-          entry.slug
-            ? `
-              <a
-                href="portal.html?area=${encodeURIComponent(area)}&post=${encodeURIComponent(entry.slug)}"
-              >
-                Ler publicação →
-              </a>
-            `
-            : ''
-        }
-
-      </div>
-
-    </article>
-  `;
-}
 
       return `
         <article class="card">
