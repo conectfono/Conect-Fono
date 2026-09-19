@@ -1217,14 +1217,66 @@ function bindAdmin() {
     contentForm.onsubmit = async ev => {
       ev.preventDefault();
 
-      const id = $('#content-id').value;
+const id = $('#content-id').value;
 
-      const item = {
+const fileInput = $('#content-cover');
+const file = fileInput.files[0];
+
+let coverUrl = null;
+
+if (id) {
+  const existingEntry = contentEntries.find(
+    entry => entry.id === id
+  );
+
+  coverUrl = existingEntry?.cover_url || null;
+}
+
+if (file) {
+  const safeName = file.name
+    .toLowerCase()
+    .replace(/[^a-z0-9.-]+/g, '-');
+
+  const filePath =
+    `${session.id}/${crypto.randomUUID()}-${safeName}`;
+
+  const { error: uploadError } =
+    await supabaseClient
+      .storage
+      .from('content-covers')
+      .upload(filePath, file, {
+        cacheControl: '3600',
+        upsert: false
+      });
+
+  if (uploadError) {
+    console.error(
+      'Erro ao enviar capa:',
+      uploadError
+    );
+
+    toast(
+      'Não foi possível enviar a imagem de capa.'
+    );
+
+    return;
+  }
+
+  const { data: publicData } =
+    supabaseClient
+      .storage
+      .from('content-covers')
+      .getPublicUrl(filePath);
+
+  coverUrl = publicData.publicUrl;
+}
+
+const item = {
   area: $('#content-area').value,
   title: $('#content-title').value.trim(),
   description: $('#content-description').value.trim(),
   url: $('#content-url').value.trim() || null,
-  cover_url: $('#content-cover').value.trim() || null,
+  cover_url: coverUrl,
   content_type: $('#content-type').value,
   published: $('#content-published').checked
 };
