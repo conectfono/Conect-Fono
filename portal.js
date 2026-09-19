@@ -1,6 +1,11 @@
+const params = new URLSearchParams(location.search);
+
 const area =
-  new URLSearchParams(location.search).get('area') ||
+  params.get('area') ||
   'conteudos';
+
+const postSlug =
+  params.get('post');
 
 const labels = {
   conteudos: [
@@ -73,6 +78,125 @@ const escapeHTML = value =>
     "'": '&#39;',
     '"': '&quot;'
   }[c]));
+
+async function loadPost() {
+  if (!postSlug) return;
+
+  const postContainer =
+    document.querySelector('#post');
+
+  const entriesContainer =
+    document.querySelector('#entries');
+
+  const { data: post, error } =
+    await supabaseClient
+      .from('content_entries')
+      .select('*')
+      .eq('area', area)
+      .eq('slug', postSlug)
+      .eq('published', true)
+      .maybeSingle();
+
+  if (error) {
+    console.error(
+      'Erro ao carregar publicação:',
+      error
+    );
+
+    return;
+  }
+
+  if (!post) {
+    postContainer.hidden = false;
+
+    postContainer.innerHTML = `
+      <div class="empty">
+        <h2>Publicação não encontrada.</h2>
+        <p>
+          A publicação que você tentou acessar
+          não está disponível.
+        </p>
+      </div>
+    `;
+
+    entriesContainer.hidden = true;
+
+    return;
+  }
+
+  document.querySelector('#eyebrow').textContent =
+    area === 'pesquisa'
+      ? 'CIÊNCIA & PESQUISA'
+      : 'PROJETOS';
+
+  document.querySelector('#title').textContent =
+    post.title;
+
+  document.querySelector('#intro').textContent =
+    '';
+
+  entriesContainer.hidden = true;
+
+  postContainer.hidden = false;
+
+  postContainer.innerHTML = `
+    ${
+      post.cover_url
+        ? `
+          <img
+            src="${escapeHTML(post.cover_url)}"
+            alt="${escapeHTML(post.title)}"
+            loading="lazy"
+          />
+        `
+        : ''
+    }
+
+    <small>
+      ${
+        post.author_name
+          ? `Por ${escapeHTML(post.author_name)}`
+          : ''
+      }
+
+      ${
+        post.published_at
+          ? ` · ${formatDate(post.published_at)}`
+          : ''
+      }
+    </small>
+
+    <h2>
+      ${escapeHTML(post.title)}
+    </h2>
+
+    ${
+      post.description
+        ? `
+          <p>
+            ${escapeHTML(post.description)}
+          </p>
+        `
+        : ''
+    }
+
+    ${
+      post.body
+        ? `
+          <div class="post-body">
+            ${escapeHTML(post.body)}
+          </div>
+        `
+        : ''
+    }
+
+    <p>
+      <a href="portal.html?area=${encodeURIComponent(area)}">
+        ← Voltar para publicações
+      </a>
+    </p>
+  `;
+}
 
 async function loadEntries() {
   const { data, error } =
@@ -205,4 +329,8 @@ async function loadEntries() {
     }).join('');
 }
 
-loadEntries();
+if (postSlug) {
+  loadPost();
+} else {
+  loadEntries();
+}
