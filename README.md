@@ -1,27 +1,124 @@
 # CONECT FONO
 
-Plataforma local funcional para comunidade acadêmica de Fonoaudiologia.
+Plataforma acadêmica e comunitária para estudantes, professores e profissionais de Fonoaudiologia.
 
-## Como executar
+A CONECT FONO reúne conteúdos, oportunidades, ciência, projetos, eventos e uma loja da comunidade em uma única plataforma.
 
-Abra `index.html` em um navegador. Nâo ha dependências para instalar.
+## Tecnologias
 
-## Pessoas usuarias
+- HTML, CSS e JavaScript
+- Supabase
+- Supabase Auth
+- PostgreSQL
+- Row Level Security (RLS)
+- Supabase Storage
 
-1. Clique em **Entrar / Cadastrar** no canto superior direito.
-2. Em **Criar conta**, informe nome, e-mail, perfil (estudante ou professor) e senha.
-3. Depois de entrar, abra **área administrativa**: cada pessoa ver seu painel, com as próprias inscrições e a opÃ§Ã£o de cancelÃ¡-las.
-4. Para entrar em um evento, clique em **Saiba mais** no banner em destaque. A inscriÃ§Ã£o Ã© registrada imediatamente.
+## Funcionalidades
 
-## AdministraÃ§Ã£o
+### Usuários
 
-Use a conta inicial abaixo para acessar a gestão completa:
+- Criação de conta
+- Login e logout
+- Sessão persistente
+- Perfis de estudante e professor
+- Área pessoal
+- Consulta das próprias inscrições
+- Cancelamento das próprias inscrições
 
-- E-mail: `admin@connectfono.com`
-- Senha: `connect2026`
+### Eventos
 
-O painel administrativo permite criar, editar, excluir e destacar eventos; consultar/remover cadastros; e consultar/cancelar inscrições.
+- Eventos públicos
+- Criação e edição pelo administrador
+- Exclusão de eventos pelo administrador
+- Destaque de eventos
+- Inscrição de usuários autenticados
+- Cancelamento de inscrição
+- Proteção contra inscrição duplicada
 
-## Dados e produÃ§Ã£o
+### Conteúdos
 
-Esta versão armazena contas, eventos e inscrições no `localStorage` do navegador. Ela Ã© ideal para demonstraÃ§Ã£o e operaÃ§Ã£o local, mas dados nÃ£o sÃ£o compartilhados entre computadores. Para publicar a plataforma com contas reais, serÃ¡ necessÃ¡rio conectar os mesmos fluxos a um serviÃ§o de autenticaÃ§Ã£o e banco de dados (por exemplo, Supabase ou Firebase) e hospedar o site.
+A plataforma possui quatro áreas:
+
+- **Conteúdos** — acesso exclusivo para usuários autenticados
+- **Oportunidades** — acesso exclusivo para usuários autenticados
+- **Ciência & Pesquisa** — área pública
+- **Projetos** — área pública
+
+Os conteúdos podem ser publicados, editados e excluídos pelo administrador.
+
+Também é possível utilizar imagens de capa armazenadas no Supabase Storage.
+
+### Loja
+
+A loja é pública para visitantes.
+
+O administrador pode:
+
+- cadastrar produtos;
+- editar produtos;
+- substituir imagens;
+- remover produtos;
+- gerenciar informações de preço, descrição e WhatsApp.
+
+As imagens dos produtos são armazenadas no Supabase Storage.
+
+## Segurança
+
+A plataforma utiliza Row Level Security (RLS) no banco de dados.
+
+As principais regras incluem:
+
+- usuários só podem acessar seus próprios dados pessoais;
+- usuários só podem gerenciar suas próprias inscrições;
+- administradores possuem permissões administrativas;
+- conteúdos privados exigem autenticação;
+- conteúdos públicos permanecem acessíveis sem login;
+- produtos ativos podem ser visualizados publicamente;
+- alterações de produtos são restritas ao administrador;
+- arquivos administrativos do Storage são protegidos por políticas de acesso.
+
+## Banco de dados
+
+Os principais recursos armazenados no Supabase incluem:
+
+- `profiles`
+- `events`
+- `enrollments`
+- `products`
+- `content_entries`
+- `user_consents`
+- `audit_logs`
+
+O projeto também utiliza funções e políticas do PostgreSQL para controle de acesso e regras da aplicação.
+
+## Configuração
+
+A aplicação utiliza as credenciais públicas do projeto Supabase através da configuração do site.
+
+A chave pública do Supabase pode ser utilizada no frontend conforme as políticas RLS configuradas no banco.
+
+**Não coloque chaves secretas, service role keys, senhas administrativas ou outras credenciais privadas no código público ou neste README.**
+
+## Desenvolvimento
+
+Para desenvolvimento local, abra os arquivos do projeto através de um servidor local ou hospede-os em um serviço compatível com páginas estáticas.
+
+A aplicação depende da configuração correta do Supabase para autenticação, banco de dados e armazenamento.
+
+## Estrutura principal
+
+```text
+/
+├── index.html
+├── app.js
+├── styles.css
+├── hub.css
+├── eventos.html
+├── eventos.js
+├── portal.html
+├── portal.js
+├── loja.html
+├── loja.js
+├── supabase-config.js
+├── assets/
+└── README.md
