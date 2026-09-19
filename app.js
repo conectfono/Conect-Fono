@@ -819,6 +819,15 @@ function contentManager() {
         </label>
 
         <label>
+  Imagem de capa
+  <input
+    id="content-cover"
+    type="url"
+    placeholder="https://..."
+  />
+</label>
+
+        <label>
           Tipo
           <select id="content-type">
             <option value="material">Material</option>
