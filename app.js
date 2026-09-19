@@ -102,10 +102,25 @@ async function loadEnrollmentsFromSupabase() {
   }));
 }
 
+async function loadContentEntriesFromSupabase() {
+  const { data, error } = await supabaseClient
+    .from('content_entries')
+    .select('*')
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    console.error('Erro ao carregar conteúdos:', error);
+    return;
+  }
+
+  contentEntries = data || [];
+}
+
 async function refreshData() {
   await loadEventsFromSupabase();
   await loadEnrollmentsFromSupabase();
   await loadProfilesFromSupabase();
+  await loadContentEntriesFromSupabase();
 }
 
 /* =========================================================
