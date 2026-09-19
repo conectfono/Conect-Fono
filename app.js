@@ -1101,48 +1101,32 @@ function renderAdmin() {
 ========================================================= */
 
 function bindAdmin() {
-  const form =
-    $('#event-form');
+  const form = $('#event-form');
 
   if (form) {
     form.onsubmit = async ev => {
       ev.preventDefault();
 
-      const id =
-        $('#event-id').value;
+      const id = $('#event-id').value;
 
       const item = {
-        title:
-          $('#title')
-            .value
-            .trim(),
-
-        date:
-          $('#date')
-            .value,
-
-        place:
-          $('#place')
-            .value
-            .trim(),
-
-        description:
-          $('#description')
-            .value
-            .trim(),
-
-        status:
-          $('#status')
-            .value,
-
-        featured:
-          $('#featured')
-          .checked
+        title: $('#title').value.trim(),
+        date: $('#date').value,
+        place: $('#place').value.trim(),
+        description: $('#description').value.trim(),
+        status: $('#status').value,
+        featured: $('#featured').checked
       };
 
       const request = id
-        ? supabaseClient.from('events').update(item).eq('id', id)
-        : supabaseClient.from('events').insert(item);
+        ? supabaseClient
+            .from('events')
+            .update(item)
+            .eq('id', id)
+        : supabaseClient
+            .from('events')
+            .insert(item);
+
       const { error } = await request;
 
       if (error) {
@@ -1155,72 +1139,65 @@ function bindAdmin() {
       renderFeatured();
       renderAdmin();
 
-      toast(
-        'Evento salvo com sucesso.'
-      );
+      toast('Evento salvo com sucesso.');
     };
   }
 
-const contentForm = $('#content-form');
+  const contentForm = $('#content-form');
 
-if (contentForm) {
-  contentForm.onsubmit = async ev => {
-    ev.preventDefault();
+  if (contentForm) {
+    contentForm.onsubmit = async ev => {
+      ev.preventDefault();
 
-    const id = $('#content-id').value;
+      const id = $('#content-id').value;
 
-    const item = {
-      area: $('#content-area').value,
-      title: $('#content-title').value.trim(),
-      description: $('#content-description').value.trim(),
-      url: $('#content-url').value.trim() || null,
-      content_type: $('#content-type').value,
-      published: $('#content-published').checked
+      const item = {
+        area: $('#content-area').value,
+        title: $('#content-title').value.trim(),
+        description: $('#content-description').value.trim(),
+        url: $('#content-url').value.trim() || null,
+        content_type: $('#content-type').value,
+        published: $('#content-published').checked
+      };
+
+      const request = id
+        ? supabaseClient
+            .from('content_entries')
+            .update(item)
+            .eq('id', id)
+        : supabaseClient
+            .from('content_entries')
+            .insert(item);
+
+      const { error } = await request;
+
+      if (error) {
+        console.error('Erro ao salvar conteúdo:', error);
+        toast('Não foi possível salvar o conteúdo.');
+        return;
+      }
+
+      toast('Conteúdo salvo com sucesso.');
+
+      contentForm.reset();
+      $('#content-published').checked = true;
+
+      renderManagerSection('content');
     };
+  }
 
-    const request = id
-      ? supabaseClient
-          .from('content_entries')
-          .update(item)
-          .eq('id', id)
-      : supabaseClient
-          .from('content_entries')
-          .insert(item);
-
-    const { error } = await request;
-
-    if (error) {
-      console.error('Erro ao salvar conteúdo:', error);
-      toast('Não foi possível salvar o conteúdo.');
-      return;
-    }
-
-    toast('Conteúdo salvo com sucesso.');
-
-    contentForm.reset();
-    $('#content-published').checked = true;
-
-    renderAdmin();
-  };
-}
-   
-  const logout =
-    $('#logout');
+  const logout = $('#logout');
 
   if (logout) {
-    logout.onclick =
-      signOut;
+    logout.onclick = signOut;
   }
 
-  const cancelEdit =
-    $('#cancel-edit');
+  const cancelEdit = $('#cancel-edit');
 
   if (cancelEdit) {
-    cancelEdit.onclick =
-      () => renderAdmin();
+    cancelEdit.onclick = () => renderAdmin();
   }
 }
-
 
 /* =========================================================
    CLIQUES DO ADMIN
