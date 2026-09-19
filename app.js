@@ -1161,6 +1161,49 @@ function bindAdmin() {
     };
   }
 
+const contentForm = $('#content-form');
+
+if (contentForm) {
+  contentForm.onsubmit = async ev => {
+    ev.preventDefault();
+
+    const id = $('#content-id').value;
+
+    const item = {
+      area: $('#content-area').value,
+      title: $('#content-title').value.trim(),
+      description: $('#content-description').value.trim(),
+      url: $('#content-url').value.trim() || null,
+      content_type: $('#content-type').value,
+      published: $('#content-published').checked
+    };
+
+    const request = id
+      ? supabaseClient
+          .from('content_entries')
+          .update(item)
+          .eq('id', id)
+      : supabaseClient
+          .from('content_entries')
+          .insert(item);
+
+    const { error } = await request;
+
+    if (error) {
+      console.error('Erro ao salvar conteúdo:', error);
+      toast('Não foi possível salvar o conteúdo.');
+      return;
+    }
+
+    toast('Conteúdo salvo com sucesso.');
+
+    contentForm.reset();
+    $('#content-published').checked = true;
+
+    renderAdmin();
+  };
+}
+   
   const logout =
     $('#logout');
 
