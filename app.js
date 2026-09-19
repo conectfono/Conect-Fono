@@ -1511,6 +1511,9 @@ function renderManagerSection(tab) {
   }
 if (tab === 'content') {
   content.innerHTML = contentManager();
+
+  bindAdmin();
+
   return;
 }
    
