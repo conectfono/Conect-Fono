@@ -1223,6 +1223,7 @@ const fileInput = $('#content-cover');
 const file = fileInput.files[0];
 
 let coverUrl = null;
+let coverPath = null;
 
 if (id) {
   const existingEntry = contentEntries.find(
@@ -1230,6 +1231,7 @@ if (id) {
   );
 
   coverUrl = existingEntry?.cover_url || null;
+  coverPath = existingEntry?.cover_path || null;
 }
 
 if (file) {
@@ -1269,6 +1271,7 @@ if (file) {
       .getPublicUrl(filePath);
 
   coverUrl = publicData.publicUrl;
+  coverPath = filePath;
 }
 
 const item = {
@@ -1277,10 +1280,11 @@ const item = {
   description: $('#content-description').value.trim(),
   url: $('#content-url').value.trim() || null,
   cover_url: coverUrl,
+  cover_path: coverPath,
   content_type: $('#content-type').value,
   published: $('#content-published').checked
 };
-
+       
       const request = id
         ? supabaseClient
             .from('content_entries')
