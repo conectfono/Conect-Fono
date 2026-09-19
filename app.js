@@ -1324,6 +1324,55 @@ async function adminClick(ev) {
     return;
   }
 
+     const deleteContentButton =
+    ev.target.closest(
+      '[data-delete-content]'
+    );
+
+  if (deleteContentButton) {
+    const id =
+      deleteContentButton.dataset
+        .deleteContent;
+
+    if (
+      id &&
+      confirm(
+        'Excluir este conteúdo?'
+      )
+    ) {
+      const { error } =
+        await supabaseClient
+          .from('content_entries')
+          .delete()
+          .eq('id', id);
+
+      if (error) {
+        console.error(
+          'Erro ao excluir conteúdo:',
+          error
+        );
+
+        toast(
+          'Não foi possível excluir o conteúdo.'
+        );
+
+        return;
+      }
+
+      await refreshData();
+
+      renderManagerSection(
+        'content'
+      );
+
+      toast(
+        'Conteúdo excluído.'
+      );
+    }
+
+    return;
+  }
+
   const deleteButton =
     ev.target.closest(
       '[data-delete]'
