@@ -1341,6 +1341,52 @@ async function adminClick(ev) {
     return;
   }
 
+   const editContentButton =
+  ev.target.closest(
+    '[data-edit-content]'
+  );
+
+if (editContentButton) {
+  const id =
+    editContentButton.dataset
+      .editContent;
+
+  const entry =
+    contentEntries.find(
+      item => item.id === id
+    );
+
+  if (!entry) return;
+
+  renderManagerSection('content');
+
+  $('#content-id').value =
+    entry.id;
+
+  $('#content-area').value =
+    entry.area;
+
+  $('#content-title').value =
+    entry.title || '';
+
+  $('#content-description').value =
+    entry.description || '';
+
+  $('#content-url').value =
+    entry.url || '';
+
+  $('#content-cover').value =
+    entry.cover_url || '';
+
+  $('#content-type').value =
+    entry.content_type || 'material';
+
+  $('#content-published').checked =
+    entry.published !== false;
+
+  return;
+}
+   
      const deleteContentButton =
     ev.target.closest(
       '[data-delete-content]'
