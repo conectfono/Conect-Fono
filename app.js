@@ -425,22 +425,43 @@ function renderWhatsAppCommunity() {
    POPULAÇÃO
 ========================================================= */
 
-function renderPopulation() {
-  const members = users.filter(
-    u =>
-      u.role === 'student' ||
-      u.role === 'teacher'
-  );
-
+async function renderPopulation() {
   const count = $('#member-count');
   const avatars = $('#member-avatars');
 
   if (count) {
-    count.textContent =
-      members.length;
+    count.textContent = '...';
+  }
+
+  const { data, error } =
+    await supabaseClient.rpc(
+      'get_community_member_count'
+    );
+
+  if (error) {
+    console.error(
+      'Erro ao carregar contador da comunidade:',
+      error
+    );
+
+    if (count) {
+      count.textContent = '0';
+    }
+
+    return;
+  }
+
+  if (count) {
+    count.textContent = data ?? 0;
   }
 
   if (avatars) {
+    const members = users.filter(
+      u =>
+        u.role === 'student' ||
+        u.role === 'teacher'
+    );
+
     avatars.innerHTML =
       members
         .slice(0, 5)
@@ -2276,7 +2297,7 @@ document.addEventListener(
 
     renderHeader();
 
-    renderPopulation();
+    await renderPopulation();
 
     renderFeatured();
 
