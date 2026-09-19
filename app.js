@@ -818,12 +818,12 @@ function contentManager() {
           />
         </label>
 
-        <label>
+       <label>
   Imagem de capa
   <input
     id="content-cover"
-    type="url"
-    placeholder="https://..."
+    type="file"
+    accept="image/*"
   />
 </label>
 
