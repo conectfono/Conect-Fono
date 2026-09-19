@@ -1352,7 +1352,10 @@ async function adminClick(ev) {
   if (removeUserButton) {
     /* Auth users must only be removed by a protected server-side action.
        The browser is deliberately not allowed to delete accounts. */
-    toast('A exclusão de contas deve ser feita no painel seguro do Supabase.');
+    toast(
+      'A exclusão de contas deve ser feita no painel seguro do Supabase.'
+    );
+
     return;
   }
 
@@ -1372,14 +1375,22 @@ async function adminClick(ev) {
         'Cancelar esta inscrição?'
       )
     ) {
-      const { error } = await supabaseClient
-        .from('enrollments')
-        .delete()
-        .eq('id', id);
+      const { error } =
+        await supabaseClient
+          .from('enrollments')
+          .delete()
+          .eq('id', id);
 
       if (error) {
-        console.error('Erro ao cancelar inscrição:', error);
-        toast('Não foi possível cancelar a inscrição.');
+        console.error(
+          'Erro ao cancelar inscrição:',
+          error
+        );
+
+        toast(
+          'Não foi possível cancelar a inscrição.'
+        );
+
         return;
       }
 
@@ -1397,53 +1408,60 @@ async function adminClick(ev) {
     return;
   }
 
-   const editContentButton =
-  ev.target.closest(
-    '[data-edit-content]'
-  );
-
-if (editContentButton) {
-  const id =
-    editContentButton.dataset
-      .editContent;
-
-  const entry =
-    contentEntries.find(
-      item => item.id === id
+  const editContentButton =
+    ev.target.closest(
+      '[data-edit-content]'
     );
 
-  if (!entry) return;
+  if (editContentButton) {
+    const id =
+      editContentButton.dataset
+        .editContent;
 
-  renderManagerSection('content');
+    const entry =
+      contentEntries.find(
+        item => item.id === id
+      );
 
-  $('#content-id').value =
-    entry.id;
+    if (!entry) return;
 
-  $('#content-area').value =
-    entry.area;
+    renderManagerSection(
+      'content'
+    );
 
-  $('#content-title').value =
-    entry.title || '';
+    $('#content-id').value =
+      entry.id;
 
-  $('#content-description').value =
-    entry.description || '';
+    $('#content-area').value =
+      entry.area;
 
-  $('#content-url').value =
-    entry.url || '';
+    $('#content-title').value =
+      entry.title || '';
 
-  $('#content-cover').value =
-    entry.cover_url || '';
+    $('#content-description').value =
+      entry.description || '';
 
-  $('#content-type').value =
-    entry.content_type || 'material';
+    $('#content-url').value =
+      entry.url || '';
 
-  $('#content-published').checked =
-    entry.published !== false;
+    /*
+      O campo de arquivo não recebe
+      a URL da imagem existente.
+      Se nenhuma nova imagem for escolhida,
+      o cover_path e cover_url atuais
+      serão preservados pelo salvamento.
+    */
 
-  return;
-}
-   
-     const deleteContentButton =
+    $('#content-type').value =
+      entry.content_type || 'material';
+
+    $('#content-published').checked =
+      entry.published !== false;
+
+    return;
+  }
+
+  const deleteContentButton =
     ev.target.closest(
       '[data-delete-content]'
     );
@@ -1459,6 +1477,34 @@ if (editContentButton) {
         'Excluir este conteúdo?'
       )
     ) {
+      const entry =
+        contentEntries.find(
+          item => item.id === id
+        );
+
+      if (entry?.cover_path) {
+        const { error: storageError } =
+          await supabaseClient
+            .storage
+            .from('content-covers')
+            .remove([
+              entry.cover_path
+            ]);
+
+        if (storageError) {
+          console.error(
+            'Erro ao excluir imagem:',
+            storageError
+          );
+
+          toast(
+            'Não foi possível excluir a imagem de capa.'
+          );
+
+          return;
+        }
+      }
+
       const { error } =
         await supabaseClient
           .from('content_entries')
@@ -1485,7 +1531,7 @@ if (editContentButton) {
       );
 
       toast(
-        'Conteúdo excluído.'
+        'Conteúdo e imagem excluídos com sucesso.'
       );
     }
 
@@ -1507,14 +1553,22 @@ if (editContentButton) {
         'Excluir este evento?'
       )
     ) {
-      const { error } = await supabaseClient
-        .from('events')
-        .delete()
-        .eq('id', id);
+      const { error } =
+        await supabaseClient
+          .from('events')
+          .delete()
+          .eq('id', id);
 
       if (error) {
-        console.error('Erro ao excluir evento:', error);
-        toast('Não foi possível excluir o evento.');
+        console.error(
+          'Erro ao excluir evento:',
+          error
+        );
+
+        toast(
+          'Não foi possível excluir o evento.'
+        );
+
         return;
       }
 
@@ -1605,7 +1659,6 @@ if (editContentButton) {
         false;
   }
 }
-
 
 /* =========================================================
    ABAS DO ADMIN
