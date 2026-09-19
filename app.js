@@ -846,7 +846,43 @@ function contentManager() {
       </form>
 
       <div id="content-list">
-        <p>Nenhum conteúdo carregado.</p>
+
+        ${
+          contentEntries
+            .map(
+              entry => `
+                <div class="event-row">
+
+                  <div>
+                    <strong>
+                      ${escapeHTML(entry.title)}
+                    </strong>
+
+                    <small>
+                      ${escapeHTML(entry.area)}
+                      ·
+                      ${
+                        entry.published
+                          ? 'Publicado'
+                          : 'Rascunho'
+                      }
+                    </small>
+                  </div>
+
+                  <button
+                    class="delete"
+                    data-delete-content="${entry.id}"
+                  >
+                    Excluir
+                  </button>
+
+                </div>
+              `
+            )
+            .join('') ||
+          '<p>Nenhum conteúdo carregado.</p>'
+        }
+
       </div>
 
     </div>
