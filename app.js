@@ -878,12 +878,19 @@ function contentManager() {
                     </small>
                   </div>
 
-                  <button
-                    class="delete"
-                    data-delete-content="${entry.id}"
-                  >
-                    Excluir
-                  </button>
+                 <button
+  class="edit"
+  data-edit-content="${entry.id}"
+>
+  Editar
+</button>
+
+<button
+  class="delete"
+  data-delete-content="${entry.id}"
+>
+  Excluir
+</button>
 
                 </div>
               `
